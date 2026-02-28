@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diario Filatelico</title>
+    <style>
+        /* --- STILI BASE E VARIABILI --- */
+        :root {
+            --avorio: #FFFFF0;
+            --pagine-bordo: #e8e8d8;
+            --testo: #333;
+        }
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #2c3e50;
+            color: var(--testo);
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+            transition: cursor 0.3s;
+        }
+
+        /* --- ENIGMA (GATEKEEPER) --- */
+        #enigma-screen {
+            position: absolute;
+            background: #1a252f; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100; transition: opacity 1s ease;
+        }
+        #enigma-screen h1 { color: var(--avorio); }
+        #enigma-input {
+            padding: 10px; font-size: 18px; text-align: center;
+            border: 2px solid var(--avorio); background: transparent; color: white; outline: none;
+        }
+
+        /* --- LIBRO IN AVORIO --- */
+        #app-screen {
+            display: none; opacity: 0; transition: opacity 1s ease;
+            position: relative; width: 90vw; max-width: 1000px; height: 80vh;
+        }
+        .book {
+            display: flex; width: 100%; height: 100%;
+            background-color: var(--avorio);
+            border-radius: 10px;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.1), 10px 15px 30px rgba(0,0,0,0.4);
+            position: relative;
+        }
+        /* La rilegatura centrale */
+        .book::after {
+            content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+            width: 40px; transform: translateX(-50%);
+            background: linear-gradient(to right, rgba(0,0,0,0.05), rgba(0,0,0,0.2), rgba(0,0,0,0.05));
+        }
+
+        /* --- PAGINE E COLONNE --- */
+        .page {
+            flex: 1; padding: 40px; display: flex; gap: 20px;
+            position: relative; overflow: hidden;
+        }
+        .column {
+            flex: 1; display: flex; flex-direction: column; align-items: center;
+        }
+        .date-header {
+            font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; text-transform: uppercase;
+        }
+        .slot-container {
+            display: flex; flex-direction: column; gap: 15px; width: 100%;
+        }
+        .slot {
+            width: 100px; height: 100px; background: rgba(0,0,0,0.05);
+            border: 2px dashed #ccc; border-radius: 5px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: 0.2s; position: relative;
+        }
+        .slot:hover { border-color: #888; }
+
+        /* --- EFFETTO FRANCOBOLLO --- */
+        .stamp {
+            width: 90px; height: 90px;
+            background-size: cover; background-position: center;
+            /* Simulazione bordi a francobollo tramite maschera radiale */
+            mask-image: radial-gradient(circle at 0 0, transparent 4px, black 5px);
+            -webkit-mask-image: radial-gradient(circle at 4px 4px, black 100%, transparent 0);
+            -webkit-mask-position: -4px -4px;
+            -webkit-mask-size: 12px 12px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* --- UI CONTROLLI --- */
+        #folder-btn {
+            position: absolute; bottom: -50px; right: 20px;
+            font-size: 2rem; cursor: pointer; background: none; border: none;
+            transition: transform 0.2s;
+        }
+        #folder-btn:hover { transform: scale(1.2); }
+        .page-corner {
+            position: absolute; bottom: 0; width: 50px; height: 50px;
+            cursor: pointer; background: rgba(0,0,0,0.05); transition: background 0.3s;
+        }
+        .corner-left { left: 0; border-top-right-radius: 50px; }
+        .corner-right { right: 0; border-top-left-radius: 50px; }
+        .page-corner:hover { background: rgba(0,0,0,0.2); }
+
+    </style>
+</head>
+<body>
+
+    <div id="enigma-screen">
+        <h1>Qual è la password? (Suggerimento: colore del libro)</h1>
+        <input type="text" id="enigma-input" placeholder="Scrivi qui...">
+    </div>
+
+    <div id="app-screen">
+        <div class="book">
+            <div class="page" id="page-left">
+                <div class="column">
+                    <div class="date-header" id="date-col-1">Data 1</div>
+                    <div class="slot-container" data-col="1">
+                        <div class="slot" data-index="1"></div>
+                        <div class="slot" data-index="2"></div>
+                        <div class="slot" data-index="3"></div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="date-header" id="date-col-2">Data 2</div>
+                    <div class="slot-container" data-col="2">
+                        <div class="slot" data-index="1"></div>
+                        <div class="slot" data-index="2"></div>
+                        <div class="slot" data-index="3"></div>
+                    </div>
+                </div>
+                <div class="page-corner corner-left" id="prev-page" title="Pagina precedente"></div>
+            </div>
+
+            <div class="page" id="page-right">
+                <div class="column">
+                    <div class="date-header" id="date-col-3">Data 3</div>
+                    <div class="slot-container" data-col="3">
+                        <div class="slot" data-index="1"></div>
+                        <div class="slot" data-index="2"></div>
+                        <div class="slot" data-index="3"></div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="date-header" id="date-col-4">Data 4</div>
+                    <div class="slot-container" data-col="4">
+                        <div class="slot" data-index="1"></div>
+                        <div class="slot" data-index="2"></div>
+                        <div class="slot" data-index="3"></div>
+                    </div>
+                </div>
+                <div class="page-corner corner-right" id="next-page" title="Pagina successiva"></div>
+            </div>
+        </div>
+
+        <button id="folder-btn" title="Importa Immagine">📁</button>
+        <input type="file" id="file-input" accept="image/*" style="display: none;">
+    </div>
+
+    <script>
+        // --- 1. LOGICA ENIGMA ---
+        const enigmaInput = document.getElementById('enigma-input');
+        const enigmaScreen = document.getElementById('enigma-screen');
+        const appScreen = document.getElementById('app-screen');
+
+        enigmaInput.addEventListener('keyup', (e) => {
+            if (e.target.value.toUpperCase() === 'AVORIO') {
+                enigmaScreen.style.opacity = 0;
+                setTimeout(() => {
+                    enigmaScreen.style.display = 'none';
+                    appScreen.style.display = 'block';
+                    setTimeout(() => appScreen.style.opacity = 1, 50);
+                }, 1000);
+            }
+        });
+
+        // --- 2. LOGICA CALENDARIO E IMPAGINAZIONE ---
+        let currentOffset = 0; // 0 significa visualizzare oggi. Numeri negativi vanno indietro nel tempo.
+
+        function formatDate(date) {
+            const options = { day: '2-digit', month: 'short', year: 'numeric' };
+            return date.toLocaleDateString('it-IT', options);
+        }
+
+        function updateDates() {
+            const today = new Date();
+            // Calcoliamo le 4 date per le 4 colonne basandoci sull'offset
+            // Colonna 4 = Oggi (se offset è 0). Colonna 3 = Ieri. Col 2 = L'altro ieri. Col 1 = 3 giorni fa.
+            for (let i = 1; i <= 4; i++) {
+                const day = new Date(today);
+                // day.setDate(oggi - (4 - indice) + offset)
+                day.setDate(today.getDate() - (4 - i) + currentOffset); 
+                
+                const dateString = formatDate(day);
+                document.getElementById(`date-col-${i}`).textContent = dateString;
+                
+                // Aggiorniamo l'attributo data dei contenitori per il LocalStorage
+                document.querySelector(`.slot-container[data-col="${i}"]`).setAttribute('data-date', dateString);
+            }
+            loadStampsFromStorage();
+        }
+
+        // Cambio pagina
+        document.getElementById('prev-page').addEventListener('click', () => {
+            currentOffset -= 4; // Vai indietro di 4 giorni (due pagine intere)
+            updateDates();
+        });
+        document.getElementById('next-page').addEventListener('click', () => {
+            if (currentOffset < 0) { // Impedisci di andare nel futuro
+                currentOffset += 4;
+                if (currentOffset > 0) currentOffset = 0;
+                updateDates();
+            }
+        });
+
+        // --- 3. LOGICA UPLOAD E FRANCOBOLLO ---
+        const fileInput = document.getElementById('file-input');
+        const folderBtn = document.getElementById('folder-btn');
+        let activeStampImage = null;
+
+        folderBtn.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    activeStampImage = event.target.result;
+                    // Cambia il cursore (simulato con un cursore crosshair per il ritaglio)
+                    document.body.style.cursor = 'crosshair';
+                    alert("Immagine caricata! Clicca su uno dei quadrati vuoti per incollare il francobollo.");
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // --- 4. LOGICA SALVATAGGIO (LOCALSTORAGE) ---
+        const slots = document.querySelectorAll('.slot');
+
+        slots.forEach(slot => {
+            slot.addEventListener('click', function() {
+                // Se abbiamo un'immagine in memoria e clicchiamo su uno slot
+                if (activeStampImage) {
+                    const containerDate = this.parentElement.getAttribute('data-date');
+                    const slotIndex = this.getAttribute('data-index');
+                    const storageKey = `stamp_${containerDate}_${slotIndex}`;
+
+                    // Applica graficamente
+                    applyStampToSlot(this, activeStampImage);
+
+                    // Salva nel browser
+                    localStorage.setItem(storageKey, activeStampImage);
+
+                    // Resetta lo strumento
+                    activeStampImage = null;
+                    document.body.style.cursor = 'default';
+                    fileInput.value = ''; // Resetta input
+                }
+            });
+        });
+
+        function applyStampToSlot(slotElement, imageDataBase64) {
+            slotElement.innerHTML = ''; // Pulisci lo slot
+            const stampDiv = document.createElement('div');
+            stampDiv.className = 'stamp';
+            stampDiv.style.backgroundImage = `url(${imageDataBase64})`;
+            slotElement.appendChild(stampDiv);
+        }
+
+        function loadStampsFromStorage() {
+            // Pulisci tutti gli slot prima di ricaricare
+            slots.forEach(slot => slot.innerHTML = '');
+
+            // Ricarica per le date attualmente visualizzate
+            for (let i = 1; i <= 4; i++) {
+                const container = document.querySelector(`.slot-container[data-col="${i}"]`);
+                const containerDate = container.getAttribute('data-date');
+                
+                const slotElements = container.querySelectorAll('.slot');
+                slotElements.forEach(slot => {
+                    const slotIndex = slot.getAttribute('data-index');
+                    const storageKey = `stamp_${containerDate}_${slotIndex}`;
+                    const savedImage = localStorage.getItem(storageKey);
+                    
+                    if (savedImage) {
+                        applyStampToSlot(slot, savedImage);
+                    }
+                });
+            }
+        }
+
+        // Inizializza l'app
+        updateDates();
+
+    </script>
+</body>
+</html>
