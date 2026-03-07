@@ -57,13 +57,23 @@
             background: linear-gradient(to right, rgba(0,0,0,0.05), rgba(0,0,0,0.2), rgba(0,0,0,0.05));
         }
 
-        /* SPOTIFY LATERALE */
+        /* SPOTIFY LATERALE + CARTELLINA */
         #spotify-container {
-            width: 300px; height: 450px;
+            width: 300px; height: 500px;
             background: rgba(0,0,0,0.2); border-radius: 15px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 20px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            padding: 10px;
         }
+
+        /* TASTO CARTELLINA RIPOSIZIONATO */
+        #folder-btn {
+            font-size: 3.5rem; cursor: pointer;
+            background: none; border: none; z-index: 50;
+            transition: transform 0.2s;
+        }
+        #folder-btn:hover { transform: scale(1.1); }
 
         .page { flex: 1; padding: 20px 40px; display: flex; gap: 20px; position: relative; overflow: hidden; }
         .column { flex: 1; display: flex; flex-direction: column; align-items: center; }
@@ -85,11 +95,6 @@
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         }
 
-        /* CONTROLLI */
-        #folder-btn {
-            position: absolute; bottom: 20px; left: 20px; font-size: 2.5rem; cursor: pointer;
-            background: none; border: none; z-index: 50;
-        }
         .page-corner { position: absolute; bottom: 0; width: 70px; height: 70px; cursor: pointer; background: rgba(0,0,0,0.03); }
         .corner-left { left: 0; border-top-right-radius: 70px; }
         .corner-right { right: 0; border-top-left-radius: 70px; }
@@ -168,10 +173,12 @@
             </div>
 
             <div id="spotify-container">
-               <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6QnGn5n8qGGnWn6UlHu1Ah?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> </div>
+               <iframe style="border-radius:12px" src="http://googleusercontent.com/spotify.com/6" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> 
+               
+               <button id="folder-btn">📁</button>
+            </div>
         </div>
 
-        <button id="folder-btn">📁</button>
         <input type="file" id="file-input" accept="image/*" style="display: none;">
     </div>
 
@@ -201,7 +208,6 @@
             }
         });
 
-        // Calendario e Salvataggio (stessa logica di prima)
         let currentOffset = 0;
         function formatDate(date) { return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }); }
         
@@ -220,7 +226,6 @@
         document.getElementById('prev-page').addEventListener('click', () => { currentOffset -= 4; updateDates(); });
         document.getElementById('next-page').addEventListener('click', () => { if (currentOffset < 0) { currentOffset += 4; if (currentOffset > 0) currentOffset = 0; updateDates(); } });
 
-        // Stato App
         let appState = 'IDLE'; 
         let cropSize = 200; 
         let finalCroppedBase64 = null;
