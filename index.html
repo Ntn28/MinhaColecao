@@ -52,7 +52,7 @@
         .date-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
         .slot-container { display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: center; }
         
-        /* 5 SLOT PIU' GRANDI */
+        /* 4 SLOT PER NON TAGLIARE LO SCHERMO */
         .slot {
             width: 120px; height: 120px; background: rgba(0,0,0,0.03);
             border: 2px dashed #bbb; border-radius: 4px;
@@ -61,11 +61,10 @@
         }
         .slot:hover { border-color: #555; background: rgba(0,0,0,0.08); }
 
-        /* EFFETTO FRANCOBOLLO (Bordi dentellati perfetti) */
+        /* EFFETTO FRANCOBOLLO */
         .stamp-placed {
             width: 116px; height: 116px; position: absolute;
             background-size: cover; background-position: center;
-            /* Maschera per i bordi a francobollo */
             -webkit-mask-image: radial-gradient(circle at 5px 5px, black 100%, transparent 0);
             -webkit-mask-position: -5px -5px; 
             -webkit-mask-size: 14px 14px;
@@ -85,6 +84,12 @@
         .corner-right { right: 0; border-top-left-radius: 70px; }
         .page-corner:hover { background: rgba(0,0,0,0.15); }
 
+        /* --- SPOTIFY PLAYER --- */
+        #spotify-widget {
+            position: absolute; top: 15px; right: 20px; z-index: 50;
+            transition: opacity 0.5s ease;
+        }
+
         /* --- OVERLAY RITAGLIO --- */
         #crop-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -101,7 +106,6 @@
             background-repeat: no-repeat; background-position: center;
         }
 
-        /* FRANCOBOLLO LOCKATO SUL MOUSE */
         #floating-stamp {
             position: fixed; pointer-events: none; z-index: 2100;
             width: 116px; height: 116px; display: none;
@@ -143,6 +147,11 @@
     </div>
 
     <div id="app-screen">
+        
+        <div id="spotify-widget">
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0?utm_source=generator&theme=0" width="250" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+
         <div class="book">
             <div class="page" id="page-left">
                 <div class="column">
@@ -173,9 +182,9 @@
     </div>
 
     <script>
-        // 1. GENERAZIONE 5 SLOT GRANDI
+        // 1. GENERAZIONE 4 SLOT GRANDI
         document.querySelectorAll('.slot-container').forEach(container => {
-            for(let i = 1; i <= 5; i++) {
+            for(let i = 1; i <= 4; i++) {
                 const slot = document.createElement('div');
                 slot.className = 'slot';
                 slot.setAttribute('data-index', i);
@@ -183,7 +192,7 @@
             }
         });
 
-        // 2. ENIGMA (Nuova Password)
+        // 2. ENIGMA (Controllo Password)
         const enigmaInput = document.getElementById('enigma-input');
         const enigmaScreen = document.getElementById('enigma-screen');
         const appScreen = document.getElementById('app-screen');
@@ -220,7 +229,7 @@
 
         // 4. GESTIONE STATI
         let appState = 'IDLE'; 
-        let cropSize = 200; // Grandezza iniziale
+        let cropSize = 200; 
         let finalCroppedBase64 = null;
         let mouseX = 0, mouseY = 0;
 
@@ -243,18 +252,18 @@
             }
         });
 
-        // Zoom Estremo (Rotellina)
+        // Zoom Estremo
         document.addEventListener('wheel', (e) => {
             if (appState === 'CROPPING') {
-                cropSize += e.deltaY > 0 ? -40 : 40; // Step più grande per zoomare velocemente
-                if (cropSize < 20) cropSize = 20; // Rimpicciolimento estremo
-                if (cropSize > 2000) cropSize = 2000; // Ingrandimento estremo
+                cropSize += e.deltaY > 0 ? -40 : 40; 
+                if (cropSize < 20) cropSize = 20; 
+                if (cropSize > 2000) cropSize = 2000; 
                 cropCursor.style.width = `${cropSize}px`;
                 cropCursor.style.height = `${cropSize}px`;
             }
         });
 
-        // 5. IMPORTA E AVVIA RITAGLIO
+        // 5. IMPORTA
         document.getElementById('folder-btn').addEventListener('click', () => document.getElementById('file-input').click());
         
         document.getElementById('file-input').addEventListener('change', (e) => {
@@ -273,7 +282,7 @@
             }
         });
 
-        // 6. ESEGUI IL RITAGLIO
+        // 6. RITAGLIO
         cropImage.addEventListener('click', (e) => {
             if (appState !== 'CROPPING') return;
 
@@ -306,10 +315,9 @@
             floatingStamp.style.top = `${mouseY}px`;
         });
 
-        // 7. GESTIONE CLICK SUGLI SLOT (Incolla o Apri Fullscreen)
+        // 7. SLOT CLICK
         document.querySelectorAll('.slot').forEach(slot => {
             slot.addEventListener('click', function(e) {
-                // SE STIAMO INCOLLANDO
                 if (appState === 'PLACING' && finalCroppedBase64) {
                     const offsetX = (Math.random() - 0.5) * 12; 
                     const offsetY = (Math.random() - 0.5) * 12; 
@@ -329,11 +337,9 @@
                     finalCroppedBase64 = null;
                     document.getElementById('file-input').value = ''; 
                 } 
-                // SE CLICCHIAMO SU UN FRANCOBOLLO GIA' INCOLLATO (FULLSCREEN)
                 else if (appState === 'IDLE') {
                     const stampElement = this.querySelector('.stamp-placed');
                     if (stampElement) {
-                        // Estraiamo l'URL dell'immagine dal background-image
                         const bgImage = stampElement.style.backgroundImage;
                         const imageUrl = bgImage.replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
                         
@@ -344,7 +350,6 @@
             });
         });
 
-        // Chiudi il Fullscreen cliccando ovunque
         fullscreenOverlay.addEventListener('click', () => {
             fullscreenOverlay.style.display = 'none';
         });
