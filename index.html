@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diario Filatelico</title>
+    <title>MinhaColecao</title>
     <style>
         :root {
             --avorio: #FFFFF0;
@@ -15,7 +15,7 @@
             background-color: #2c3e50;
             color: var(--testo);
             display: flex; justify-content: center; align-items: center;
-            height: 100vh; overflow: hidden;
+            height: 100vh; width: 100vw; overflow: hidden;
             user-select: none;
         }
 
@@ -27,18 +27,27 @@
         }
         #enigma-screen h1 { color: var(--avorio); margin-bottom: 20px; text-align: center;}
         #enigma-input {
-            padding: 12px; font-size: 20px; text-align: center; width: 300px;
+            padding: 12px; font-size: 20px; text-align: center; width: 350px;
             border: 2px solid var(--avorio); background: transparent; color: white; outline: none;
             text-transform: uppercase;
         }
 
-        /* --- LIBRO --- */
+        /* --- LAYOUT PRINCIPALE --- */
         #app-screen {
             display: none; opacity: 0; transition: opacity 1s ease;
-            position: relative; width: 95vw; max-width: 1300px; height: 95vh;
+            width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            position: relative;
         }
+
+        /* CONTENITORE LIBRO + WIDGET */
+        .main-container {
+            display: flex; align-items: center; gap: 40px;
+            width: 95%; max-width: 1600px; height: 90vh;
+        }
+
         .book {
-            display: flex; width: 100%; height: 100%; background-color: var(--avorio);
+            flex: 1; display: flex; height: 100%; background-color: var(--avorio);
             border-radius: 10px; box-shadow: inset 0 0 50px rgba(0,0,0,0.1), 10px 15px 30px rgba(0,0,0,0.4);
             position: relative;
         }
@@ -47,85 +56,70 @@
             width: 40px; transform: translateX(-50%);
             background: linear-gradient(to right, rgba(0,0,0,0.05), rgba(0,0,0,0.2), rgba(0,0,0,0.05));
         }
+
+        /* SPOTIFY LATERALE */
+        #spotify-container {
+            width: 300px; height: 450px;
+            background: rgba(0,0,0,0.2); border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
         .page { flex: 1; padding: 20px 40px; display: flex; gap: 20px; position: relative; overflow: hidden; }
         .column { flex: 1; display: flex; flex-direction: column; align-items: center; }
-        .date-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
+        .date-header { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
         .slot-container { display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: center; }
         
-        /* 4 SLOT PER NON TAGLIARE LO SCHERMO */
         .slot {
             width: 120px; height: 120px; background: rgba(0,0,0,0.03);
             border: 2px dashed #bbb; border-radius: 4px;
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; position: relative; transition: border-color 0.2s;
+            cursor: pointer; position: relative;
         }
-        .slot:hover { border-color: #555; background: rgba(0,0,0,0.08); }
 
-        /* EFFETTO FRANCOBOLLO */
         .stamp-placed {
             width: 116px; height: 116px; position: absolute;
             background-size: cover; background-position: center;
             -webkit-mask-image: radial-gradient(circle at 5px 5px, black 100%, transparent 0);
-            -webkit-mask-position: -5px -5px; 
-            -webkit-mask-size: 14px 14px;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
-            cursor: pointer;
+            -webkit-mask-position: -5px -5px; -webkit-mask-size: 14px 14px;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         }
-        .stamp-placed:hover { filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.6)) brightness(1.05); }
 
-        /* --- UI CONTROLLI --- */
+        /* CONTROLLI */
         #folder-btn {
-            position: absolute; bottom: -30px; right: 20px; font-size: 2.5rem; cursor: pointer;
-            background: none; border: none; transition: transform 0.2s; z-index: 50;
+            position: absolute; bottom: 20px; left: 20px; font-size: 2.5rem; cursor: pointer;
+            background: none; border: none; z-index: 50;
         }
-        #folder-btn:hover { transform: scale(1.2); }
-        .page-corner { position: absolute; bottom: 0; width: 70px; height: 70px; cursor: pointer; background: rgba(0,0,0,0.05); }
+        .page-corner { position: absolute; bottom: 0; width: 70px; height: 70px; cursor: pointer; background: rgba(0,0,0,0.03); }
         .corner-left { left: 0; border-top-right-radius: 70px; }
         .corner-right { right: 0; border-top-left-radius: 70px; }
-        .page-corner:hover { background: rgba(0,0,0,0.15); }
 
-        /* --- SPOTIFY PLAYER --- */
-        #spotify-widget {
-            position: absolute; top: 15px; right: 20px; z-index: 50;
-            transition: opacity 0.5s ease;
-        }
-
-        /* --- OVERLAY RITAGLIO --- */
+        /* OVERLAY RITAGLIO */
         #crop-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.85); z-index: 2000;
             justify-content: center; align-items: center; cursor: none;
         }
-        #crop-image { max-width: 95vw; max-height: 95vh; object-fit: contain; }
-        
+        #crop-image { max-width: 90vw; max-height: 90vh; object-fit: contain; }
         #crop-cursor {
             position: fixed; pointer-events: none;
             border: 2px dashed #fff; box-shadow: 0 0 0 9999px rgba(0,0,0,0.7);
             transform: translate(-50%, -50%); display: none;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>');
-            background-repeat: no-repeat; background-position: center;
         }
 
         #floating-stamp {
             position: fixed; pointer-events: none; z-index: 2100;
-            width: 116px; height: 116px; display: none;
-            transform: translate(-50%, -50%);
+            width: 116px; height: 116px; display: none; transform: translate(-50%, -50%);
             -webkit-mask-image: radial-gradient(circle at 5px 5px, black 100%, transparent 0);
             -webkit-mask-position: -5px -5px; -webkit-mask-size: 14px 14px;
-            filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.6));
             background-size: cover; background-position: center;
         }
 
-        /* --- OVERLAY FULLSCREEN FOTO --- */
         #fullscreen-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.92); z-index: 3000;
-            justify-content: center; align-items: center; cursor: pointer;
+            background: rgba(0,0,0,0.92); z-index: 3000; justify-content: center; align-items: center; cursor: pointer;
         }
-        #fullscreen-img {
-            max-width: 90vw; max-height: 90vh; border: 8px solid white; border-radius: 4px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
-        }
+        #fullscreen-img { max-width: 90vw; max-height: 90vh; border: 5px solid white; }
     </style>
 </head>
 <body>
@@ -142,47 +136,47 @@
     
     <div id="floating-stamp"></div>
 
-    <div id="fullscreen-overlay" title="Clicca per chiudere">
-        <img id="fullscreen-img" src="" alt="Zoom">
+    <div id="fullscreen-overlay">
+        <img id="fullscreen-img" src="">
     </div>
 
     <div id="app-screen">
-        
-        <div id="spotify-widget">
-            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0?utm_source=generator&theme=0" width="250" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-        </div>
-
-        <div class="book">
-            <div class="page" id="page-left">
-                <div class="column">
-                    <div class="date-header" id="date-col-1">Data</div>
-                    <div class="slot-container" data-col="1"></div>
+        <div class="main-container">
+            <div class="book">
+                <div class="page">
+                    <div class="column">
+                        <div class="date-header" id="date-col-1"></div>
+                        <div class="slot-container" data-col="1"></div>
+                    </div>
+                    <div class="column">
+                        <div class="date-header" id="date-col-2"></div>
+                        <div class="slot-container" data-col="2"></div>
+                    </div>
+                    <div class="page-corner corner-left" id="prev-page"></div>
                 </div>
-                <div class="column">
-                    <div class="date-header" id="date-col-2">Data</div>
-                    <div class="slot-container" data-col="2"></div>
+                <div class="page">
+                    <div class="column">
+                        <div class="date-header" id="date-col-3"></div>
+                        <div class="slot-container" data-col="3"></div>
+                    </div>
+                    <div class="column">
+                        <div class="date-header" id="date-col-4"></div>
+                        <div class="slot-container" data-col="4"></div>
+                    </div>
+                    <div class="page-corner corner-right" id="next-page"></div>
                 </div>
-                <div class="page-corner corner-left" id="prev-page" title="Indietro"></div>
             </div>
 
-            <div class="page" id="page-right">
-                <div class="column">
-                    <div class="date-header" id="date-col-3">Data</div>
-                    <div class="slot-container" data-col="3"></div>
-                </div>
-                <div class="column">
-                    <div class="date-header" id="date-col-4">Oggi</div>
-                    <div class="slot-container" data-col="4"></div>
-                </div>
-                <div class="page-corner corner-right" id="next-page" title="Avanti"></div>
-            </div>
+            <div id="spotify-container">
+               <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6QnGn5n8qGGnWn6UlHu1Ah?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> </div>
         </div>
-        <button id="folder-btn" title="Importa immagine">📁</button>
+
+        <button id="folder-btn">📁</button>
         <input type="file" id="file-input" accept="image/*" style="display: none;">
     </div>
 
     <script>
-        // 1. GENERAZIONE 4 SLOT GRANDI
+        // Logica Slots (4 per colonna)
         document.querySelectorAll('.slot-container').forEach(container => {
             for(let i = 1; i <= 4; i++) {
                 const slot = document.createElement('div');
@@ -192,7 +186,6 @@
             }
         });
 
-        // 2. ENIGMA (Controllo Password)
         const enigmaInput = document.getElementById('enigma-input');
         const enigmaScreen = document.getElementById('enigma-screen');
         const appScreen = document.getElementById('app-screen');
@@ -202,13 +195,13 @@
                 enigmaScreen.style.opacity = 0;
                 setTimeout(() => {
                     enigmaScreen.style.display = 'none';
-                    appScreen.style.display = 'block';
+                    appScreen.style.display = 'flex';
                     setTimeout(() => appScreen.style.opacity = 1, 50);
                 }, 1000);
             }
         });
 
-        // 3. CALENDARIO
+        // Calendario e Salvataggio (stessa logica di prima)
         let currentOffset = 0;
         function formatDate(date) { return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }); }
         
@@ -227,7 +220,7 @@
         document.getElementById('prev-page').addEventListener('click', () => { currentOffset -= 4; updateDates(); });
         document.getElementById('next-page').addEventListener('click', () => { if (currentOffset < 0) { currentOffset += 4; if (currentOffset > 0) currentOffset = 0; updateDates(); } });
 
-        // 4. GESTIONE STATI
+        // Stato App
         let appState = 'IDLE'; 
         let cropSize = 200; 
         let finalCroppedBase64 = null;
@@ -237,10 +230,7 @@
         const cropImage = document.getElementById('crop-image');
         const cropCursor = document.getElementById('crop-cursor');
         const floatingStamp = document.getElementById('floating-stamp');
-        const fullscreenOverlay = document.getElementById('fullscreen-overlay');
-        const fullscreenImg = document.getElementById('fullscreen-img');
 
-        // Mouse Tracker
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX; mouseY = e.clientY;
             if (appState === 'CROPPING') {
@@ -252,20 +242,17 @@
             }
         });
 
-        // Zoom Estremo
         document.addEventListener('wheel', (e) => {
             if (appState === 'CROPPING') {
                 cropSize += e.deltaY > 0 ? -40 : 40; 
                 if (cropSize < 20) cropSize = 20; 
-                if (cropSize > 2000) cropSize = 2000; 
+                if (cropSize > 1500) cropSize = 1500; 
                 cropCursor.style.width = `${cropSize}px`;
                 cropCursor.style.height = `${cropSize}px`;
             }
         });
 
-        // 5. IMPORTA
         document.getElementById('folder-btn').addEventListener('click', () => document.getElementById('file-input').click());
-        
         document.getElementById('file-input').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -282,114 +269,64 @@
             }
         });
 
-        // 6. RITAGLIO
         cropImage.addEventListener('click', (e) => {
             if (appState !== 'CROPPING') return;
-
             const rect = cropImage.getBoundingClientRect();
             const scaleX = cropImage.naturalWidth / rect.width;
             const scaleY = cropImage.naturalHeight / rect.height;
-
             const imgMouseX = mouseX - rect.left;
             const imgMouseY = mouseY - rect.top;
-
             const canvas = document.createElement('canvas');
             canvas.width = cropSize; canvas.height = cropSize;
             const ctx = canvas.getContext('2d');
-
-            const sx = (imgMouseX - cropSize / 2) * scaleX;
-            const sy = (imgMouseY - cropSize / 2) * scaleY;
-            const sWidth = cropSize * scaleX;
-            const sHeight = cropSize * scaleY;
-
-            ctx.drawImage(cropImage, sx, sy, sWidth, sHeight, 0, 0, cropSize, cropSize);
+            ctx.drawImage(cropImage, (imgMouseX - cropSize/2)*scaleX, (imgMouseY - cropSize/2)*scaleY, cropSize*scaleX, cropSize*scaleY, 0, 0, cropSize, cropSize);
             finalCroppedBase64 = canvas.toDataURL('image/png');
-
             appState = 'PLACING';
             cropOverlay.style.display = 'none';
             cropCursor.style.display = 'none';
-            
             floatingStamp.style.display = 'block';
             floatingStamp.style.backgroundImage = `url(${finalCroppedBase64})`;
-            floatingStamp.style.left = `${mouseX}px`;
-            floatingStamp.style.top = `${mouseY}px`;
         });
 
-        // 7. SLOT CLICK
         document.querySelectorAll('.slot').forEach(slot => {
-            slot.addEventListener('click', function(e) {
+            slot.addEventListener('click', function() {
                 if (appState === 'PLACING' && finalCroppedBase64) {
-                    const offsetX = (Math.random() - 0.5) * 12; 
-                    const offsetY = (Math.random() - 0.5) * 12; 
-                    const rotation = (Math.random() - 0.5) * 10; 
-
-                    const stampData = { image: finalCroppedBase64, x: offsetX, y: offsetY, r: rotation };
-
-                    const containerDate = this.parentElement.getAttribute('data-date');
-                    const slotIndex = this.getAttribute('data-index');
-                    const storageKey = `stamp_${containerDate}_${slotIndex}`;
-
+                    const stampData = { 
+                        image: finalCroppedBase64, 
+                        x: (Math.random()-0.5)*12, 
+                        y: (Math.random()-0.5)*12, 
+                        r: (Math.random()-0.5)*10 
+                    };
+                    const key = `stamp_${this.parentElement.getAttribute('data-date')}_${this.getAttribute('data-index')}`;
                     applyStampToSlot(this, stampData);
-                    localStorage.setItem(storageKey, JSON.stringify(stampData));
-
-                    appState = 'IDLE';
-                    floatingStamp.style.display = 'none';
-                    finalCroppedBase64 = null;
-                    document.getElementById('file-input').value = ''; 
-                } 
-                else if (appState === 'IDLE') {
-                    const stampElement = this.querySelector('.stamp-placed');
-                    if (stampElement) {
-                        const bgImage = stampElement.style.backgroundImage;
-                        const imageUrl = bgImage.replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
-                        
-                        fullscreenImg.src = imageUrl;
-                        fullscreenOverlay.style.display = 'flex';
+                    localStorage.setItem(key, JSON.stringify(stampData));
+                    appState = 'IDLE'; floatingStamp.style.display = 'none';
+                } else if (appState === 'IDLE') {
+                    const img = this.querySelector('.stamp-placed');
+                    if (img) {
+                        document.getElementById('fullscreen-img').src = img.style.backgroundImage.slice(5, -2);
+                        document.getElementById('fullscreen-overlay').style.display = 'flex';
                     }
                 }
             });
         });
 
-        fullscreenOverlay.addEventListener('click', () => {
-            fullscreenOverlay.style.display = 'none';
-        });
+        document.getElementById('fullscreen-overlay').addEventListener('click', function() { this.style.display = 'none'; });
 
-        function applyStampToSlot(slotElement, stampData) {
-            slotElement.innerHTML = ''; 
-            const stampDiv = document.createElement('div');
-            stampDiv.className = 'stamp-placed';
-            stampDiv.style.backgroundImage = `url(${stampData.image})`;
-            stampDiv.style.transform = `translate(${stampData.x}px, ${stampData.y}px) rotate(${stampData.r}deg)`;
-            stampDiv.title = "Clicca per ingrandire";
-            slotElement.appendChild(stampDiv);
+        function applyStampToSlot(slot, data) {
+            slot.innerHTML = `<div class="stamp-placed" style="background-image:url(${data.image}); transform:translate(${data.x}px, ${data.y}px) rotate(${data.r}deg)"></div>`;
         }
 
-        // 8. CARICAMENTO DATI
         function loadStampsFromStorage() {
-            document.querySelectorAll('.slot').forEach(slot => slot.innerHTML = '');
-
-            for (let i = 1; i <= 4; i++) {
-                const container = document.querySelector(`.slot-container[data-col="${i}"]`);
-                const containerDate = container.getAttribute('data-date');
-                
-                container.querySelectorAll('.slot').forEach(slot => {
-                    const slotIndex = slot.getAttribute('data-index');
-                    const savedData = localStorage.getItem(`stamp_${containerDate}_${slotIndex}`);
-                    
-                    if (savedData) {
-                        try {
-                            const stampData = JSON.parse(savedData);
-                            applyStampToSlot(slot, stampData);
-                        } catch(e) {
-                            applyStampToSlot(slot, { image: savedData, x: 0, y: 0, r: 0 });
-                        }
-                    }
-                });
-            }
+            document.querySelectorAll('.slot').forEach(slot => {
+                const key = `stamp_${slot.parentElement.getAttribute('data-date')}_${slot.getAttribute('data-index')}`;
+                const data = localStorage.getItem(key);
+                slot.innerHTML = '';
+                if (data) applyStampToSlot(slot, JSON.parse(data));
+            });
         }
 
         updateDates();
-
     </script>
 </body>
 </html>
