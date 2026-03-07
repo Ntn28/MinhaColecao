@@ -25,16 +25,17 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 1000; transition: opacity 1s ease;
         }
-        #enigma-screen h1 { color: var(--avorio); }
+        #enigma-screen h1 { color: var(--avorio); margin-bottom: 20px; text-align: center;}
         #enigma-input {
-            padding: 10px; font-size: 18px; text-align: center;
+            padding: 12px; font-size: 20px; text-align: center; width: 300px;
             border: 2px solid var(--avorio); background: transparent; color: white; outline: none;
+            text-transform: uppercase;
         }
 
         /* --- LIBRO --- */
         #app-screen {
             display: none; opacity: 0; transition: opacity 1s ease;
-            position: relative; width: 95vw; max-width: 1200px; height: 90vh;
+            position: relative; width: 95vw; max-width: 1300px; height: 95vh;
         }
         .book {
             display: flex; width: 100%; height: 100%; background-color: var(--avorio);
@@ -46,76 +47,88 @@
             width: 40px; transform: translateX(-50%);
             background: linear-gradient(to right, rgba(0,0,0,0.05), rgba(0,0,0,0.2), rgba(0,0,0,0.05));
         }
-        .page { flex: 1; padding: 30px; display: flex; gap: 15px; position: relative; overflow: hidden; }
+        .page { flex: 1; padding: 20px 40px; display: flex; gap: 20px; position: relative; overflow: hidden; }
         .column { flex: 1; display: flex; flex-direction: column; align-items: center; }
-        .date-header { font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
-        .slot-container { display: flex; flex-direction: column; gap: 10px; width: 100%; align-items: center; }
+        .date-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
+        .slot-container { display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: center; }
         
-        /* 5 SLOT (più piccoli per farli entrare) */
+        /* 5 SLOT PIU' GRANDI */
         .slot {
-            width: 80px; height: 80px; background: rgba(0,0,0,0.03);
+            width: 120px; height: 120px; background: rgba(0,0,0,0.03);
             border: 2px dashed #bbb; border-radius: 4px;
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; position: relative;
+            cursor: pointer; position: relative; transition: border-color 0.2s;
         }
         .slot:hover { border-color: #555; background: rgba(0,0,0,0.08); }
 
-        /* EFFETTO FRANCOBOLLO */
+        /* EFFETTO FRANCOBOLLO (Bordi dentellati perfetti) */
         .stamp-placed {
-            width: 76px; height: 76px; position: absolute;
+            width: 116px; height: 116px; position: absolute;
             background-size: cover; background-position: center;
-            mask-image: radial-gradient(circle at 0 0, transparent 3px, black 4px);
-            -webkit-mask-image: radial-gradient(circle at 3px 3px, black 100%, transparent 0);
-            -webkit-mask-position: -3px -3px; -webkit-mask-size: 10px 10px;
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+            /* Maschera per i bordi a francobollo */
+            -webkit-mask-image: radial-gradient(circle at 5px 5px, black 100%, transparent 0);
+            -webkit-mask-position: -5px -5px; 
+            -webkit-mask-size: 14px 14px;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
+            cursor: pointer;
         }
+        .stamp-placed:hover { filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.6)) brightness(1.05); }
 
         /* --- UI CONTROLLI --- */
         #folder-btn {
-            position: absolute; bottom: -40px; right: 20px; font-size: 2rem; cursor: pointer;
+            position: absolute; bottom: -30px; right: 20px; font-size: 2.5rem; cursor: pointer;
             background: none; border: none; transition: transform 0.2s; z-index: 50;
         }
         #folder-btn:hover { transform: scale(1.2); }
-        .page-corner { position: absolute; bottom: 0; width: 60px; height: 60px; cursor: pointer; background: rgba(0,0,0,0.05); }
-        .corner-left { left: 0; border-top-right-radius: 60px; }
-        .corner-right { right: 0; border-top-left-radius: 60px; }
+        .page-corner { position: absolute; bottom: 0; width: 70px; height: 70px; cursor: pointer; background: rgba(0,0,0,0.05); }
+        .corner-left { left: 0; border-top-right-radius: 70px; }
+        .corner-right { right: 0; border-top-left-radius: 70px; }
+        .page-corner:hover { background: rgba(0,0,0,0.15); }
 
-        /* --- OVERLAY RITAGLIO (CROPPING) --- */
+        /* --- OVERLAY RITAGLIO --- */
         #crop-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.85); z-index: 2000;
             justify-content: center; align-items: center; cursor: none;
         }
-        #crop-image { max-width: 90vw; max-height: 90vh; object-fit: contain; }
+        #crop-image { max-width: 95vw; max-height: 95vh; object-fit: contain; }
         
-        /* Il quadrato che segue il mouse */
         #crop-cursor {
             position: fixed; pointer-events: none;
-            border: 2px dashed #fff; box-shadow: 0 0 0 9999px rgba(0,0,0,0.6);
+            border: 2px dashed #fff; box-shadow: 0 0 0 9999px rgba(0,0,0,0.7);
             transform: translate(-50%, -50%); display: none;
-            /* Icona taglierino finta */
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>');
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>');
             background-repeat: no-repeat; background-position: center;
         }
 
-        /* Il francobollo che segue il mouse in attesa di posizionamento */
+        /* FRANCOBOLLO LOCKATO SUL MOUSE */
         #floating-stamp {
             position: fixed; pointer-events: none; z-index: 2100;
-            width: 80px; height: 80px; display: none;
+            width: 116px; height: 116px; display: none;
             transform: translate(-50%, -50%);
-            mask-image: radial-gradient(circle at 0 0, transparent 3px, black 4px);
-            -webkit-mask-image: radial-gradient(circle at 3px 3px, black 100%, transparent 0);
-            -webkit-mask-position: -3px -3px; -webkit-mask-size: 10px 10px;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+            -webkit-mask-image: radial-gradient(circle at 5px 5px, black 100%, transparent 0);
+            -webkit-mask-position: -5px -5px; -webkit-mask-size: 14px 14px;
+            filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.6));
             background-size: cover; background-position: center;
+        }
+
+        /* --- OVERLAY FULLSCREEN FOTO --- */
+        #fullscreen-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.92); z-index: 3000;
+            justify-content: center; align-items: center; cursor: pointer;
+        }
+        #fullscreen-img {
+            max-width: 90vw; max-height: 90vh; border: 8px solid white; border-radius: 4px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
         }
     </style>
 </head>
 <body>
 
     <div id="enigma-screen">
-        <h1>Password (Colore del libro)</h1>
-        <input type="text" id="enigma-input" autocomplete="off">
+        <h1>Fear some lethal dust star</h1>
+        <input type="text" id="enigma-input" autocomplete="off" placeholder="Password...">
     </div>
 
     <div id="crop-overlay">
@@ -125,19 +138,22 @@
     
     <div id="floating-stamp"></div>
 
+    <div id="fullscreen-overlay" title="Clicca per chiudere">
+        <img id="fullscreen-img" src="" alt="Zoom">
+    </div>
+
     <div id="app-screen">
         <div class="book">
             <div class="page" id="page-left">
                 <div class="column">
                     <div class="date-header" id="date-col-1">Data</div>
-                    <div class="slot-container" data-col="1">
-                        </div>
+                    <div class="slot-container" data-col="1"></div>
                 </div>
                 <div class="column">
                     <div class="date-header" id="date-col-2">Data</div>
                     <div class="slot-container" data-col="2"></div>
                 </div>
-                <div class="page-corner corner-left" id="prev-page"></div>
+                <div class="page-corner corner-left" id="prev-page" title="Indietro"></div>
             </div>
 
             <div class="page" id="page-right">
@@ -146,18 +162,18 @@
                     <div class="slot-container" data-col="3"></div>
                 </div>
                 <div class="column">
-                    <div class="date-header" id="date-col-4">Data</div>
+                    <div class="date-header" id="date-col-4">Oggi</div>
                     <div class="slot-container" data-col="4"></div>
                 </div>
-                <div class="page-corner corner-right" id="next-page"></div>
+                <div class="page-corner corner-right" id="next-page" title="Avanti"></div>
             </div>
         </div>
-        <button id="folder-btn" title="Importa">📁</button>
+        <button id="folder-btn" title="Importa immagine">📁</button>
         <input type="file" id="file-input" accept="image/*" style="display: none;">
     </div>
 
     <script>
-        // 1. GENERAZIONE HTML DEI 5 SLOT PER COLONNA
+        // 1. GENERAZIONE 5 SLOT GRANDI
         document.querySelectorAll('.slot-container').forEach(container => {
             for(let i = 1; i <= 5; i++) {
                 const slot = document.createElement('div');
@@ -167,13 +183,13 @@
             }
         });
 
-        // 2. ENIGMA INIZIALE
+        // 2. ENIGMA (Nuova Password)
         const enigmaInput = document.getElementById('enigma-input');
         const enigmaScreen = document.getElementById('enigma-screen');
         const appScreen = document.getElementById('app-screen');
 
         enigmaInput.addEventListener('keyup', (e) => {
-            if (e.target.value.toUpperCase() === 'AVORIO') {
+            if (e.target.value.toUpperCase() === '83A80-A052B-6WJFA') {
                 enigmaScreen.style.opacity = 0;
                 setTimeout(() => {
                     enigmaScreen.style.display = 'none';
@@ -202,9 +218,9 @@
         document.getElementById('prev-page').addEventListener('click', () => { currentOffset -= 4; updateDates(); });
         document.getElementById('next-page').addEventListener('click', () => { if (currentOffset < 0) { currentOffset += 4; if (currentOffset > 0) currentOffset = 0; updateDates(); } });
 
-        // 4. STATI E VARIABILI GLOBALI
-        let appState = 'IDLE'; // IDLE, CROPPING, PLACING
-        let cropSize = 150; // Grandezza iniziale del quadrato
+        // 4. GESTIONE STATI
+        let appState = 'IDLE'; 
+        let cropSize = 200; // Grandezza iniziale
         let finalCroppedBase64 = null;
         let mouseX = 0, mouseY = 0;
 
@@ -212,8 +228,10 @@
         const cropImage = document.getElementById('crop-image');
         const cropCursor = document.getElementById('crop-cursor');
         const floatingStamp = document.getElementById('floating-stamp');
+        const fullscreenOverlay = document.getElementById('fullscreen-overlay');
+        const fullscreenImg = document.getElementById('fullscreen-img');
 
-        // Aggiorna posizione mouse globale
+        // Mouse Tracker
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX; mouseY = e.clientY;
             if (appState === 'CROPPING') {
@@ -225,13 +243,12 @@
             }
         });
 
-        // Zoom (Rotellina) per ridimensionare il quadrato
+        // Zoom Estremo (Rotellina)
         document.addEventListener('wheel', (e) => {
             if (appState === 'CROPPING') {
-                // Aumenta o diminuisci la dimensione
-                cropSize += e.deltaY > 0 ? -15 : 15;
-                if (cropSize < 50) cropSize = 50; // Limite minimo
-                if (cropSize > 400) cropSize = 400; // Limite massimo
+                cropSize += e.deltaY > 0 ? -40 : 40; // Step più grande per zoomare velocemente
+                if (cropSize < 20) cropSize = 20; // Rimpicciolimento estremo
+                if (cropSize > 2000) cropSize = 2000; // Ingrandimento estremo
                 cropCursor.style.width = `${cropSize}px`;
                 cropCursor.style.height = `${cropSize}px`;
             }
@@ -256,25 +273,21 @@
             }
         });
 
-        // 6. ESEGUI IL RITAGLIO (Click sull'immagine grande)
+        // 6. ESEGUI IL RITAGLIO
         cropImage.addEventListener('click', (e) => {
             if (appState !== 'CROPPING') return;
 
-            // Calcoli matematici per ritagliare l'immagine in base a come è visualizzata
             const rect = cropImage.getBoundingClientRect();
             const scaleX = cropImage.naturalWidth / rect.width;
             const scaleY = cropImage.naturalHeight / rect.height;
 
-            // Coordinate del cursore relative all'immagine
             const imgMouseX = mouseX - rect.left;
             const imgMouseY = mouseY - rect.top;
 
-            // Creiamo un canvas invisibile per tagliare l'immagine vera
             const canvas = document.createElement('canvas');
             canvas.width = cropSize; canvas.height = cropSize;
             const ctx = canvas.getContext('2d');
 
-            // x e y di partenza per il ritaglio nell'immagine sorgente
             const sx = (imgMouseX - cropSize / 2) * scaleX;
             const sy = (imgMouseY - cropSize / 2) * scaleY;
             const sWidth = cropSize * scaleX;
@@ -283,33 +296,26 @@
             ctx.drawImage(cropImage, sx, sy, sWidth, sHeight, 0, 0, cropSize, cropSize);
             finalCroppedBase64 = canvas.toDataURL('image/png');
 
-            // Passiamo alla fase di POSIZIONAMENTO
             appState = 'PLACING';
             cropOverlay.style.display = 'none';
             cropCursor.style.display = 'none';
             
-            // Attiviamo il francobollo fluttuante
             floatingStamp.style.display = 'block';
             floatingStamp.style.backgroundImage = `url(${finalCroppedBase64})`;
             floatingStamp.style.left = `${mouseX}px`;
             floatingStamp.style.top = `${mouseY}px`;
         });
 
-        // 7. INCOLLA NEGLI SLOT CON "TOCCO UMANO"
+        // 7. GESTIONE CLICK SUGLI SLOT (Incolla o Apri Fullscreen)
         document.querySelectorAll('.slot').forEach(slot => {
-            slot.addEventListener('click', function() {
+            slot.addEventListener('click', function(e) {
+                // SE STIAMO INCOLLANDO
                 if (appState === 'PLACING' && finalCroppedBase64) {
-                    // Creiamo l'offset casuale (Tocco Umano)
-                    const offsetX = (Math.random() - 0.5) * 12; // Da -6px a +6px
-                    const offsetY = (Math.random() - 0.5) * 12; // Da -6px a +6px
-                    const rotation = (Math.random() - 0.5) * 10; // Da -5° a +5°
+                    const offsetX = (Math.random() - 0.5) * 12; 
+                    const offsetY = (Math.random() - 0.5) * 12; 
+                    const rotation = (Math.random() - 0.5) * 10; 
 
-                    const stampData = {
-                        image: finalCroppedBase64,
-                        x: offsetX,
-                        y: offsetY,
-                        r: rotation
-                    };
+                    const stampData = { image: finalCroppedBase64, x: offsetX, y: offsetY, r: rotation };
 
                     const containerDate = this.parentElement.getAttribute('data-date');
                     const slotIndex = this.getAttribute('data-index');
@@ -318,13 +324,29 @@
                     applyStampToSlot(this, stampData);
                     localStorage.setItem(storageKey, JSON.stringify(stampData));
 
-                    // Resetta stato
                     appState = 'IDLE';
                     floatingStamp.style.display = 'none';
                     finalCroppedBase64 = null;
                     document.getElementById('file-input').value = ''; 
+                } 
+                // SE CLICCHIAMO SU UN FRANCOBOLLO GIA' INCOLLATO (FULLSCREEN)
+                else if (appState === 'IDLE') {
+                    const stampElement = this.querySelector('.stamp-placed');
+                    if (stampElement) {
+                        // Estraiamo l'URL dell'immagine dal background-image
+                        const bgImage = stampElement.style.backgroundImage;
+                        const imageUrl = bgImage.replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
+                        
+                        fullscreenImg.src = imageUrl;
+                        fullscreenOverlay.style.display = 'flex';
+                    }
                 }
             });
+        });
+
+        // Chiudi il Fullscreen cliccando ovunque
+        fullscreenOverlay.addEventListener('click', () => {
+            fullscreenOverlay.style.display = 'none';
         });
 
         function applyStampToSlot(slotElement, stampData) {
@@ -332,8 +354,8 @@
             const stampDiv = document.createElement('div');
             stampDiv.className = 'stamp-placed';
             stampDiv.style.backgroundImage = `url(${stampData.image})`;
-            // Applichiamo la sbavatura "naturale"
             stampDiv.style.transform = `translate(${stampData.x}px, ${stampData.y}px) rotate(${stampData.r}deg)`;
+            stampDiv.title = "Clicca per ingrandire";
             slotElement.appendChild(stampDiv);
         }
 
@@ -354,7 +376,6 @@
                             const stampData = JSON.parse(savedData);
                             applyStampToSlot(slot, stampData);
                         } catch(e) {
-                            // Se era salvato col vecchio formato base64 semplice
                             applyStampToSlot(slot, { image: savedData, x: 0, y: 0, r: 0 });
                         }
                     }
