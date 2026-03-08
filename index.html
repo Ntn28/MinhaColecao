@@ -8,6 +8,8 @@
         :root {
             --avorio: #FFFFF0;
             --testo: #333;
+            /* Maschera vettoriale esatta della sagoma dentellata (proporzione 4:5) */
+            --stamp-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 125' preserveAspectRatio='none'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Crect width='100' height='125' fill='%23fff'/%3E%3Cg fill='%23000'%3E%3Ccircle cx='10' cy='0' r='3'/%3E%3Ccircle cx='30' cy='0' r='3'/%3E%3Ccircle cx='50' cy='0' r='3'/%3E%3Ccircle cx='70' cy='0' r='3'/%3E%3Ccircle cx='90' cy='0' r='3'/%3E%3Ccircle cx='10' cy='125' r='3'/%3E%3Ccircle cx='30' cy='125' r='3'/%3E%3Ccircle cx='50' cy='125' r='3'/%3E%3Ccircle cx='70' cy='125' r='3'/%3E%3Ccircle cx='90' cy='125' r='3'/%3E%3Ccircle cx='0' cy='12.5' r='3'/%3E%3Ccircle cx='0' cy='32.5' r='3'/%3E%3Ccircle cx='0' cy='52.5' r='3'/%3E%3Ccircle cx='0' cy='72.5' r='3'/%3E%3Ccircle cx='0' cy='92.5' r='3'/%3E%3Ccircle cx='0' cy='112.5' r='3'/%3E%3Ccircle cx='100' cy='12.5' r='3'/%3E%3Ccircle cx='100' cy='32.5' r='3'/%3E%3Ccircle cx='100' cy='52.5' r='3'/%3E%3Ccircle cx='100' cy='72.5' r='3'/%3E%3Ccircle cx='100' cy='92.5' r='3'/%3E%3Ccircle cx='100' cy='112.5' r='3'/%3E%3C/g%3E%3C/mask%3E%3C/defs%3E%3Crect width='100' height='125' fill='%23fff' mask='url(%23m)'/%3E%3C/svg%3E");
         }
         body {
             margin: 0; padding: 0;
@@ -40,7 +42,6 @@
             position: relative;
         }
 
-        /* CONTENITORE LIBRO + WIDGET */
         .main-container {
             display: flex; align-items: center; gap: 40px;
             width: 95%; max-width: 1600px; height: 90vh;
@@ -57,17 +58,21 @@
             background: linear-gradient(to right, rgba(0,0,0,0.05), rgba(0,0,0,0.2), rgba(0,0,0,0.05));
         }
 
-        /* SPOTIFY LATERALE + CARTELLINA */
+        /* SPOTIFY LATERALE + ANNO + CARTELLINA */
         #spotify-container {
-            width: 300px; height: 500px;
+            width: 300px; height: 550px;
             background: rgba(0,0,0,0.2); border-radius: 15px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 20px;
+            gap: 15px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            padding: 10px;
+            padding: 15px;
         }
 
-        /* TASTO CARTELLINA RIPOSIZIONATO */
+        #year-display {
+            font-size: 3rem; font-weight: bold; color: var(--avorio);
+            text-shadow: 0 4px 6px rgba(0,0,0,0.3); letter-spacing: 5px; margin-bottom: -5px;
+        }
+
         #folder-btn {
             font-size: 3.5rem; cursor: pointer;
             background: none; border: none; z-index: 50;
@@ -80,18 +85,20 @@
         .date-header { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
         .slot-container { display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: center; }
         
+        /* Modificata altezza per rispecchiare il ritratto 4:5 */
         .slot {
-            width: 120px; height: 120px; background: rgba(0,0,0,0.03);
+            width: 120px; height: 150px; background: rgba(0,0,0,0.03);
             border: 2px dashed #bbb; border-radius: 4px;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; position: relative;
         }
 
         .stamp-placed {
-            width: 116px; height: 116px; position: absolute;
+            width: 116px; height: 146px; position: absolute;
             background-size: cover; background-position: center;
-            -webkit-mask-image: radial-gradient(circle at 5px 5px, black 100%, transparent 0);
-            -webkit-mask-position: -5px -5px; -webkit-mask-size: 14px 14px;
+            -webkit-mask-image: var(--stamp-mask);
+            mask-image: var(--stamp-mask);
+            -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         }
 
@@ -106,17 +113,30 @@
             justify-content: center; align-items: center; cursor: none;
         }
         #crop-image { max-width: 90vw; max-height: 90vh; object-fit: contain; }
+        
         #crop-cursor {
             position: fixed; pointer-events: none;
-            border: 2px dashed #fff; box-shadow: 0 0 0 9999px rgba(0,0,0,0.7);
             transform: translate(-50%, -50%); display: none;
+        }
+        #crop-shadow {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.7);
+        }
+        #crop-shape {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255,255,255,0.1);
+            -webkit-mask-image: var(--stamp-mask);
+            mask-image: var(--stamp-mask);
+            -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
         }
 
         #floating-stamp {
             position: fixed; pointer-events: none; z-index: 2100;
-            width: 116px; height: 116px; display: none; transform: translate(-50%, -50%);
-            -webkit-mask-image: radial-gradient(circle at 5px 5px, black 100%, transparent 0);
-            -webkit-mask-position: -5px -5px; -webkit-mask-size: 14px 14px;
+            width: 116px; height: 146px; display: none; transform: translate(-50%, -50%);
+            -webkit-mask-image: var(--stamp-mask);
+            mask-image: var(--stamp-mask);
+            -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
             background-size: cover; background-position: center;
         }
 
@@ -136,7 +156,10 @@
 
     <div id="crop-overlay">
         <img id="crop-image" src="" alt="To Crop">
-        <div id="crop-cursor"></div>
+        <div id="crop-cursor">
+            <div id="crop-shadow"></div>
+            <div id="crop-shape"></div>
+        </div>
     </div>
     
     <div id="floating-stamp"></div>
@@ -173,10 +196,9 @@
             </div>
 
             <div id="spotify-container">
-                   <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6QnGn5n8qGGnWn6UlHu1Ah?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> </div>
-
-        </div>
-               <button id="folder-btn">📁</button>
+                <div id="year-display"></div>
+                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6QnGn5n8qGGnWn6UlHu1Ah?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> 
+                <button id="folder-btn">📁</button>
             </div>
         </div>
 
@@ -209,14 +231,28 @@
             }
         });
 
+        // Mostra l'anno corrente
+        document.getElementById('year-display').textContent = new Date().getFullYear();
+
+        // Calendario con griglia FISSA (le posizioni non slittano più)
         let currentOffset = 0;
         function formatDate(date) { return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }); }
         
         function updateDates() {
             const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Data di ancoraggio della griglia (per fissare le colonne)
+            const epoch = new Date(2024, 0, 1);
+            const diffTime = today.getTime() - epoch.getTime();
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+            
+            // Calcola l'inizio del blocco di 4 giorni corrente
+            const blockStartOffset = diffDays - (diffDays % 4);
+
             for (let i = 1; i <= 4; i++) {
-                const day = new Date(today);
-                day.setDate(today.getDate() - (4 - i) + currentOffset); 
+                const day = new Date(epoch);
+                day.setDate(epoch.getDate() + blockStartOffset + (i - 1) + currentOffset); 
                 const dateString = formatDate(day);
                 document.getElementById(`date-col-${i}`).textContent = dateString;
                 document.querySelector(`.slot-container[data-col="${i}"]`).setAttribute('data-date', dateString);
@@ -227,8 +263,10 @@
         document.getElementById('prev-page').addEventListener('click', () => { currentOffset -= 4; updateDates(); });
         document.getElementById('next-page').addEventListener('click', () => { if (currentOffset < 0) { currentOffset += 4; if (currentOffset > 0) currentOffset = 0; updateDates(); } });
 
+        // Stato App e Dimensioni (proporzione 4:5 come l'immagine caricata)
         let appState = 'IDLE'; 
-        let cropSize = 200; 
+        let cropWidth = 160; 
+        let cropHeight = 200; 
         let finalCroppedBase64 = null;
         let mouseX = 0, mouseY = 0;
 
@@ -250,11 +288,13 @@
 
         document.addEventListener('wheel', (e) => {
             if (appState === 'CROPPING') {
-                cropSize += e.deltaY > 0 ? -40 : 40; 
-                if (cropSize < 20) cropSize = 20; 
-                if (cropSize > 1500) cropSize = 1500; 
-                cropCursor.style.width = `${cropSize}px`;
-                cropCursor.style.height = `${cropSize}px`;
+                const delta = e.deltaY > 0 ? -20 : 20;
+                cropWidth += delta;
+                cropHeight += delta * 1.25; // Mantiene la proporzione 4:5
+                if (cropWidth < 60) { cropWidth = 60; cropHeight = 75; }
+                if (cropWidth > 800) { cropWidth = 800; cropHeight = 1000; }
+                cropCursor.style.width = `${cropWidth}px`;
+                cropCursor.style.height = `${cropHeight}px`;
             }
         });
 
@@ -268,8 +308,8 @@
                     appState = 'CROPPING';
                     cropOverlay.style.display = 'flex';
                     cropCursor.style.display = 'block';
-                    cropCursor.style.width = `${cropSize}px`;
-                    cropCursor.style.height = `${cropSize}px`;
+                    cropCursor.style.width = `${cropWidth}px`;
+                    cropCursor.style.height = `${cropHeight}px`;
                 };
                 reader.readAsDataURL(file);
             }
@@ -282,10 +322,12 @@
             const scaleY = cropImage.naturalHeight / rect.height;
             const imgMouseX = mouseX - rect.left;
             const imgMouseY = mouseY - rect.top;
+            
             const canvas = document.createElement('canvas');
-            canvas.width = cropSize; canvas.height = cropSize;
+            canvas.width = cropWidth; canvas.height = cropHeight;
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(cropImage, (imgMouseX - cropSize/2)*scaleX, (imgMouseY - cropSize/2)*scaleY, cropSize*scaleX, cropSize*scaleY, 0, 0, cropSize, cropSize);
+            ctx.drawImage(cropImage, (imgMouseX - cropWidth/2)*scaleX, (imgMouseY - cropHeight/2)*scaleY, cropWidth*scaleX, cropHeight*scaleY, 0, 0, cropWidth, cropHeight);
+            
             finalCroppedBase64 = canvas.toDataURL('image/png');
             appState = 'PLACING';
             cropOverlay.style.display = 'none';
