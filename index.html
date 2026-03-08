@@ -8,7 +8,6 @@
         :root {
             --avorio: #FFFFF0;
             --testo: #333;
-            /* Maschera vettoriale esatta della sagoma dentellata (proporzione 4:5) */
             --stamp-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 125' preserveAspectRatio='none'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Crect width='100' height='125' fill='%23fff'/%3E%3Cg fill='%23000'%3E%3Ccircle cx='10' cy='0' r='3'/%3E%3Ccircle cx='30' cy='0' r='3'/%3E%3Ccircle cx='50' cy='0' r='3'/%3E%3Ccircle cx='70' cy='0' r='3'/%3E%3Ccircle cx='90' cy='0' r='3'/%3E%3Ccircle cx='10' cy='125' r='3'/%3E%3Ccircle cx='30' cy='125' r='3'/%3E%3Ccircle cx='50' cy='125' r='3'/%3E%3Ccircle cx='70' cy='125' r='3'/%3E%3Ccircle cx='90' cy='125' r='3'/%3E%3Ccircle cx='0' cy='12.5' r='3'/%3E%3Ccircle cx='0' cy='32.5' r='3'/%3E%3Ccircle cx='0' cy='52.5' r='3'/%3E%3Ccircle cx='0' cy='72.5' r='3'/%3E%3Ccircle cx='0' cy='92.5' r='3'/%3E%3Ccircle cx='0' cy='112.5' r='3'/%3E%3Ccircle cx='100' cy='12.5' r='3'/%3E%3Ccircle cx='100' cy='32.5' r='3'/%3E%3Ccircle cx='100' cy='52.5' r='3'/%3E%3Ccircle cx='100' cy='72.5' r='3'/%3E%3Ccircle cx='100' cy='92.5' r='3'/%3E%3Ccircle cx='100' cy='112.5' r='3'/%3E%3C/g%3E%3C/mask%3E%3C/defs%3E%3Crect width='100' height='125' fill='%23fff' mask='url(%23m)'/%3E%3C/svg%3E");
         }
         body {
@@ -21,7 +20,6 @@
             user-select: none;
         }
 
-        /* --- ENIGMA --- */
         #enigma-screen {
             position: absolute; background: #1a252f; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -34,7 +32,6 @@
             text-transform: uppercase;
         }
 
-        /* --- LAYOUT PRINCIPALE --- */
         #app-screen {
             display: none; opacity: 0; transition: opacity 1s ease;
             width: 100%; height: 100%;
@@ -58,34 +55,34 @@
             background: linear-gradient(to right, rgba(0,0,0,0.05), rgba(0,0,0,0.2), rgba(0,0,0,0.05));
         }
 
-        /* SPOTIFY LATERALE + ANNO + CARTELLINA */
         #spotify-container {
-            width: 300px; height: 550px;
+            width: 300px; height: 580px;
             background: rgba(0,0,0,0.2); border-radius: 15px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 15px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            padding: 15px;
+            gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); padding: 15px;
         }
 
         #year-display {
             font-size: 3rem; font-weight: bold; color: var(--avorio);
-            text-shadow: 0 4px 6px rgba(0,0,0,0.3); letter-spacing: 5px; margin-bottom: -5px;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.3); letter-spacing: 5px;
         }
 
-        #folder-btn {
-            font-size: 3.5rem; cursor: pointer;
+        .controls-row { display: flex; gap: 20px; align-items: center; margin-top: 10px; }
+
+        #folder-btn, #trash-btn {
+            font-size: 3rem; cursor: pointer;
             background: none; border: none; z-index: 50;
-            transition: transform 0.2s;
+            transition: transform 0.2s, filter 0.2s;
         }
-        #folder-btn:hover { transform: scale(1.1); }
+        #folder-btn:hover, #trash-btn:hover { transform: scale(1.1); }
+        #trash-btn { filter: grayscale(0.5); }
+        #trash-btn.active { filter: grayscale(0) drop-shadow(0 0 10px red); transform: scale(1.2); }
 
         .page { flex: 1; padding: 20px 40px; display: flex; gap: 20px; position: relative; overflow: hidden; }
         .column { flex: 1; display: flex; flex-direction: column; align-items: center; }
         .date-header { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
         .slot-container { display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: center; }
         
-        /* Modificata altezza per rispecchiare il ritratto 4:5 */
         .slot {
             width: 120px; height: 150px; background: rgba(0,0,0,0.03);
             border: 2px dashed #bbb; border-radius: 4px;
@@ -96,46 +93,35 @@
         .stamp-placed {
             width: 116px; height: 146px; position: absolute;
             background-size: cover; background-position: center;
-            -webkit-mask-image: var(--stamp-mask);
-            mask-image: var(--stamp-mask);
+            -webkit-mask-image: var(--stamp-mask); mask-image: var(--stamp-mask);
             -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+            pointer-events: none;
         }
 
         .page-corner { position: absolute; bottom: 0; width: 70px; height: 70px; cursor: pointer; background: rgba(0,0,0,0.03); }
         .corner-left { left: 0; border-top-right-radius: 70px; }
         .corner-right { right: 0; border-top-left-radius: 70px; }
 
-        /* OVERLAY RITAGLIO */
         #crop-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.85); z-index: 2000;
             justify-content: center; align-items: center; cursor: none;
         }
         #crop-image { max-width: 90vw; max-height: 90vh; object-fit: contain; }
-        
-        #crop-cursor {
-            position: fixed; pointer-events: none;
-            transform: translate(-50%, -50%); display: none;
-        }
-        #crop-shadow {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            box-shadow: 0 0 0 9999px rgba(0,0,0,0.7);
-        }
+        #crop-cursor { position: fixed; pointer-events: none; transform: translate(-50%, -50%); display: none; }
+        #crop-shadow { position: absolute; top: 0; left: 0; right: 0; bottom: 0; box-shadow: 0 0 0 9999px rgba(0,0,0,0.7); }
         #crop-shape {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            background: rgba(255,255,255,0.1);
-            -webkit-mask-image: var(--stamp-mask);
-            mask-image: var(--stamp-mask);
+            border: 2px solid rgba(255, 255, 255, 0.5); background: rgba(255,255,255,0.1);
+            -webkit-mask-image: var(--stamp-mask); mask-image: var(--stamp-mask);
             -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
         }
 
         #floating-stamp {
             position: fixed; pointer-events: none; z-index: 2100;
             width: 116px; height: 146px; display: none; transform: translate(-50%, -50%);
-            -webkit-mask-image: var(--stamp-mask);
-            mask-image: var(--stamp-mask);
+            -webkit-mask-image: var(--stamp-mask); mask-image: var(--stamp-mask);
             -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
             background-size: cover; background-position: center;
         }
@@ -156,41 +142,23 @@
 
     <div id="crop-overlay">
         <img id="crop-image" src="" alt="To Crop">
-        <div id="crop-cursor">
-            <div id="crop-shadow"></div>
-            <div id="crop-shape"></div>
-        </div>
+        <div id="crop-cursor"><div id="crop-shadow"></div><div id="crop-shape"></div></div>
     </div>
     
     <div id="floating-stamp"></div>
-
-    <div id="fullscreen-overlay">
-        <img id="fullscreen-img" src="">
-    </div>
+    <div id="fullscreen-overlay"><img id="fullscreen-img" src=""></div>
 
     <div id="app-screen">
         <div class="main-container">
             <div class="book">
                 <div class="page">
-                    <div class="column">
-                        <div class="date-header" id="date-col-1"></div>
-                        <div class="slot-container" data-col="1"></div>
-                    </div>
-                    <div class="column">
-                        <div class="date-header" id="date-col-2"></div>
-                        <div class="slot-container" data-col="2"></div>
-                    </div>
+                    <div class="column"><div class="date-header" id="date-col-1"></div><div class="slot-container" data-col="1"></div></div>
+                    <div class="column"><div class="date-header" id="date-col-2"></div><div class="slot-container" data-col="2"></div></div>
                     <div class="page-corner corner-left" id="prev-page"></div>
                 </div>
                 <div class="page">
-                    <div class="column">
-                        <div class="date-header" id="date-col-3"></div>
-                        <div class="slot-container" data-col="3"></div>
-                    </div>
-                    <div class="column">
-                        <div class="date-header" id="date-col-4"></div>
-                        <div class="slot-container" data-col="4"></div>
-                    </div>
+                    <div class="column"><div class="date-header" id="date-col-3"></div><div class="slot-container" data-col="3"></div></div>
+                    <div class="column"><div class="date-header" id="date-col-4"></div><div class="slot-container" data-col="4"></div></div>
                     <div class="page-corner corner-right" id="next-page"></div>
                 </div>
             </div>
@@ -198,15 +166,17 @@
             <div id="spotify-container">
                 <div id="year-display"></div>
                 <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6QnGn5n8qGGnWn6UlHu1Ah?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> 
-                <button id="folder-btn">📁</button>
+                <div class="controls-row">
+                    <button id="folder-btn">📁</button>
+                    <button id="trash-btn">🗑️</button>
+                </div>
             </div>
         </div>
-
         <input type="file" id="file-input" accept="image/*" style="display: none;">
     </div>
 
     <script>
-        // Logica Slots (4 per colonna)
+        // INIT SLOTS
         document.querySelectorAll('.slot-container').forEach(container => {
             for(let i = 1; i <= 4; i++) {
                 const slot = document.createElement('div');
@@ -216,6 +186,7 @@
             }
         });
 
+        // PASSWORD LOGIC
         const enigmaInput = document.getElementById('enigma-input');
         const enigmaScreen = document.getElementById('enigma-screen');
         const appScreen = document.getElementById('app-screen');
@@ -231,23 +202,16 @@
             }
         });
 
-        // Mostra l'anno corrente
         document.getElementById('year-display').textContent = new Date().getFullYear();
 
-        // Calendario con griglia FISSA (le posizioni non slittano più)
+        // DATE LOGIC (FISSA)
         let currentOffset = 0;
         function formatDate(date) { return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }); }
         
         function updateDates() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            // Data di ancoraggio della griglia (per fissare le colonne)
+            const today = new Date(); today.setHours(0, 0, 0, 0);
             const epoch = new Date(2024, 0, 1);
-            const diffTime = today.getTime() - epoch.getTime();
-            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-            
-            // Calcola l'inizio del blocco di 4 giorni corrente
+            const diffDays = Math.round((today - epoch) / (1000 * 60 * 60 * 24));
             const blockStartOffset = diffDays - (diffDays % 4);
 
             for (let i = 1; i <= 4; i++) {
@@ -263,38 +227,40 @@
         document.getElementById('prev-page').addEventListener('click', () => { currentOffset -= 4; updateDates(); });
         document.getElementById('next-page').addEventListener('click', () => { if (currentOffset < 0) { currentOffset += 4; if (currentOffset > 0) currentOffset = 0; updateDates(); } });
 
-        // Stato App e Dimensioni (proporzione 4:5 come l'immagine caricata)
+        // CROP & PLACING LOGIC
         let appState = 'IDLE'; 
-        let cropWidth = 160; 
-        let cropHeight = 200; 
+        let cropWidth = 160; let cropHeight = 200; 
         let finalCroppedBase64 = null;
         let mouseX = 0, mouseY = 0;
+        let pressTimer;
 
         const cropOverlay = document.getElementById('crop-overlay');
         const cropImage = document.getElementById('crop-image');
         const cropCursor = document.getElementById('crop-cursor');
         const floatingStamp = document.getElementById('floating-stamp');
+        const trashBtn = document.getElementById('trash-btn');
 
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX; mouseY = e.clientY;
             if (appState === 'CROPPING') {
-                cropCursor.style.left = `${mouseX}px`;
-                cropCursor.style.top = `${mouseY}px`;
+                cropCursor.style.left = `${mouseX}px`; cropCursor.style.top = `${mouseY}px`;
             } else if (appState === 'PLACING') {
-                floatingStamp.style.left = `${mouseX}px`;
-                floatingStamp.style.top = `${mouseY}px`;
+                floatingStamp.style.left = `${mouseX}px`; floatingStamp.style.top = `${mouseY}px`;
+                const trashRect = trashBtn.getBoundingClientRect();
+                if (mouseX > trashRect.left && mouseX < trashRect.right && mouseY > trashRect.top && mouseY < trashRect.bottom) {
+                    trashBtn.classList.add('active');
+                } else {
+                    trashBtn.classList.remove('active');
+                }
             }
         });
 
         document.addEventListener('wheel', (e) => {
             if (appState === 'CROPPING') {
                 const delta = e.deltaY > 0 ? -20 : 20;
-                cropWidth += delta;
-                cropHeight += delta * 1.25; // Mantiene la proporzione 4:5
+                cropWidth += delta; cropHeight += delta * 1.25;
                 if (cropWidth < 60) { cropWidth = 60; cropHeight = 75; }
-                if (cropWidth > 800) { cropWidth = 800; cropHeight = 1000; }
-                cropCursor.style.width = `${cropWidth}px`;
-                cropCursor.style.height = `${cropHeight}px`;
+                cropCursor.style.width = `${cropWidth}px`; cropCursor.style.height = `${cropHeight}px`;
             }
         });
 
@@ -315,36 +281,62 @@
             }
         });
 
-        cropImage.addEventListener('click', (e) => {
+        cropImage.addEventListener('click', () => {
             if (appState !== 'CROPPING') return;
             const rect = cropImage.getBoundingClientRect();
             const scaleX = cropImage.naturalWidth / rect.width;
             const scaleY = cropImage.naturalHeight / rect.height;
-            const imgMouseX = mouseX - rect.left;
-            const imgMouseY = mouseY - rect.top;
-            
             const canvas = document.createElement('canvas');
             canvas.width = cropWidth; canvas.height = cropHeight;
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(cropImage, (imgMouseX - cropWidth/2)*scaleX, (imgMouseY - cropHeight/2)*scaleY, cropWidth*scaleX, cropHeight*scaleY, 0, 0, cropWidth, cropHeight);
+            ctx.drawImage(cropImage, (mouseX - rect.left - cropWidth/2)*scaleX, (mouseY - rect.top - cropHeight/2)*scaleY, cropWidth*scaleX, cropHeight*scaleY, 0, 0, cropWidth, cropHeight);
             
             finalCroppedBase64 = canvas.toDataURL('image/png');
-            appState = 'PLACING';
+            startPlacing(finalCroppedBase64);
             cropOverlay.style.display = 'none';
-            cropCursor.style.display = 'none';
-            floatingStamp.style.display = 'block';
-            floatingStamp.style.backgroundImage = `url(${finalCroppedBase64})`;
         });
 
+        function startPlacing(imgBase64) {
+            appState = 'PLACING';
+            floatingStamp.style.display = 'block';
+            floatingStamp.style.backgroundImage = `url(${imgBase64})`;
+        }
+
+        // CESTINO LOGIC
+        trashBtn.addEventListener('click', () => {
+            if (appState === 'PLACING') {
+                appState = 'IDLE';
+                floatingStamp.style.display = 'none';
+                trashBtn.classList.remove('active');
+                finalCroppedBase64 = null;
+            }
+        });
+
+        // SLOT LOGIC (CLICK + LONG PRESS)
         document.querySelectorAll('.slot').forEach(slot => {
+            slot.addEventListener('mousedown', function(e) {
+                if (appState !== 'IDLE') return;
+                const img = this.querySelector('.stamp-placed');
+                if (!img) return;
+
+                pressTimer = setTimeout(() => {
+                    // LONG PRESS: Stacca la foto
+                    const key = `stamp_${this.parentElement.getAttribute('data-date')}_${this.getAttribute('data-index')}`;
+                    const data = JSON.parse(localStorage.getItem(key));
+                    localStorage.removeItem(key);
+                    this.innerHTML = '';
+                    finalCroppedBase64 = data.image;
+                    startPlacing(data.image);
+                    appState = 'PLACING';
+                }, 500);
+            });
+
+            slot.addEventListener('mouseup', function() { clearTimeout(pressTimer); });
+            slot.addEventListener('mouseleave', function() { clearTimeout(pressTimer); });
+
             slot.addEventListener('click', function() {
                 if (appState === 'PLACING' && finalCroppedBase64) {
-                    const stampData = { 
-                        image: finalCroppedBase64, 
-                        x: (Math.random()-0.5)*12, 
-                        y: (Math.random()-0.5)*12, 
-                        r: (Math.random()-0.5)*10 
-                    };
+                    const stampData = { image: finalCroppedBase64, x: (Math.random()-0.5)*12, y: (Math.random()-0.5)*12, r: (Math.random()-0.5)*10 };
                     const key = `stamp_${this.parentElement.getAttribute('data-date')}_${this.getAttribute('data-index')}`;
                     applyStampToSlot(this, stampData);
                     localStorage.setItem(key, JSON.stringify(stampData));
