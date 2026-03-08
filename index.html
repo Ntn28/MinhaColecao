@@ -18,6 +18,27 @@
             display: flex; justify-content: center; align-items: center;
             height: 100vh; width: 100vw; overflow: hidden;
             user-select: none;
+            position: relative; /* Necessario per posizionare le immagini di sfondo */
+        }
+
+        /* Stile per le immagini di sfondo che cadono */
+        .falling-image {
+            position: absolute;
+            background-size: cover;
+            background-position: center;
+            width: 150px; /* Dimensione base delle immagini che cadono */
+            height: 150px;
+            opacity: 0;
+            z-index: 0; /* Dietro a tutto */
+            pointer-events: none; /* Non devono interferire con i click */
+            animation: fall-and-fade linear infinite;
+        }
+
+        @keyframes fall-and-fade {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.2; } /* Appare un po' */
+            80% { opacity: 0.1; } /* Sbiadisce mentre cade */
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
         }
 
         #enigma-screen {
@@ -37,6 +58,7 @@
             width: 100%; height: 100%;
             display: flex; justify-content: center; align-items: center;
             position: relative;
+            z-index: 1; /* Il libro e i controlli devono stare sopra le immagini che cadono */
         }
 
         .main-container {
@@ -135,6 +157,8 @@
 </head>
 <body>
 
+    <div id="falling-images-container"></div>
+
     <div id="enigma-screen">
         <h1>Fear some lethal dust star</h1>
         <input type="text" id="enigma-input" autocomplete="off" placeholder="Password...">
@@ -179,6 +203,13 @@
     </div>
 
     <script>
+        // *** INSERISCI QUI GLI URL DELLE TUE FOTO DA GITHUB ***
+        const backgroundImages = [
+            'https://github.com/Ntn28/MinhaColecao/blob/b8648fd599ffb2b5e64c36c33fb58e5c470998bb/foto1.png', // Esempio: 'https://raw.githubusercontent.com/tuo_nome_utente/tuo_repository/main/foto1.jpg'
+            'https://github.com/Ntn28/MinhaColecao/blob/b8648fd599ffb2b5e64c36c33fb58e5c470998bb/foto2.png',
+            'https://github.com/Ntn28/MinhaColecao/blob/b8648fd599ffb2b5e64c36c33fb58e5c470998bb/foto3.png'
+        ];
+
         // INIT SLOTS
         document.querySelectorAll('.slot-container').forEach(container => {
             for(let i = 1; i <= 4; i++) {
@@ -201,6 +232,7 @@
                     enigmaScreen.style.display = 'none';
                     appScreen.style.display = 'flex';
                     setTimeout(() => appScreen.style.opacity = 1, 50);
+                    startFallingImages(); // Avvia le immagini che cadono dopo la password
                 }, 1000);
             }
         });
@@ -284,14 +316,12 @@
             }
         });
 
-        // *** OTTIMIZZAZIONE MEMORIA QUI ***
         cropImage.addEventListener('click', () => {
             if (appState !== 'CROPPING') return;
             const rect = cropImage.getBoundingClientRect();
             const scaleX = cropImage.naturalWidth / rect.width;
             const scaleY = cropImage.naturalHeight / rect.height;
             
-            // Creiamo un canvas con dimensioni fisse per ridurre drasticamente il peso
             const saveCanvas = document.createElement('canvas');
             saveCanvas.width = 240; 
             saveCanvas.height = 300;
@@ -306,7 +336,6 @@
                 0, 0, 240, 300
             );
             
-            // Salviamo come JPEG compresso al 70% invece che PNG
             finalCroppedBase64 = saveCanvas.toDataURL('image/jpeg', 0.7);
             
             startPlacing(finalCroppedBase64);
@@ -434,7 +463,50 @@
             reader.readAsText(file);
         });
 
-        updateDates();
-    </script>
-</body>
-</html>
+        // *** LOGICA IMMAGINI CHE CADONO SULLO SFONDO ***
+        const fallingImagesContainer = document.getElementById('falling-images-container');
+
+        function createFallingImage() {
+            const imgDiv = document.createElement('div');
+            imgDiv.className = 'falling-image';
+            const randomImage = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
+            imgDiv.style.backgroundImage = `url(${randomImage})`;
+
+            // Posizione orizzontale casuale
+            imgDiv.style.left = `${Math.random() * 100}vw`;
+
+            // Dimensione casuale (leggermente più grandi o più piccole)
+            const randomSize = 100 + Math.random() * 100; // Tra 100px e 200px
+            imgDiv.style.width = `${randomSize}px`;
+            imgDiv.style.height = `${randomSize}px`;
+
+            // Durata animazione casuale (per desincronizzare le cadute)
+            const randomDuration = 10 + Math.random() * 10; // Tra 10s e 20s
+            imgDiv.style.animationDuration = `${randomDuration}s`;
+
+            // Ritardo animazione casuale (per farle apparire in momenti diversi)
+            const randomDelay = Math.random() * 5; // Fino a 5s di ritardo
+            imgDiv.style.animationDelay = `-${randomDelay}s`; // Inizia già in animazione
+
+            // Rotazione iniziale casuale (per variare l'aspetto)
+            imgDiv.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+
+            fallingImagesContainer.appendChild(imgDiv);
+
+            // Rimuovi l'elemento una volta terminata l'animazione per non appesantire il DOM
+            imgDiv.addEventListener('animationiteration', () => {
+                imgDiv.remove();
+                createFallingImage(); // Crea una nuova immagine quando una finisce
+            });
+            // Fallback per browser che non supportano animationiteration o per pulizia
+            setTimeout(() => {
+                if (imgDiv.parentNode) { // Controlla se l'elemento è ancora nel DOM
+                    imgDiv.remove();
+                    createFallingImage();
+                }
+            }, randomDuration * 1000 + 1000); // Durata animazione + un secondo
+        }
+
+        function startFallingImages() {
+            //
