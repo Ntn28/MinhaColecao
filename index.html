@@ -46,8 +46,7 @@
         }
         .falling-photo {
             position: absolute; top: -200px;
-            opacity: 0.2; /* Opacità per non disturbare troppo la vista */
-            border-radius: 8px;
+            opacity: 0.2; border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.6);
             object-fit: cover;
             animation: fall linear infinite;
@@ -62,7 +61,7 @@
         .main-container {
             display: flex; align-items: center; gap: 40px;
             width: 95%; max-width: 1600px; height: 90vh;
-            position: relative; z-index: 10; /* Sopra lo sfondo che cade */
+            position: relative; z-index: 10;
         }
 
         .book {
@@ -81,7 +80,7 @@
             background: rgba(0,0,0,0.2); border-radius: 15px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); padding: 15px;
-            backdrop-filter: blur(8px); /* Rende lo sfondo più elegante dietro spotify */
+            backdrop-filter: blur(8px);
         }
 
         #year-display {
@@ -89,14 +88,14 @@
             text-shadow: 0 4px 6px rgba(0,0,0,0.3); letter-spacing: 5px;
         }
 
-        .controls-row { display: flex; gap: 15px; align-items: center; margin-top: 10px; }
+        .controls-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px; }
 
-        #folder-btn, #trash-btn, #export-btn, #import-btn {
-            font-size: 2.2rem; cursor: pointer;
+        .btn-icon {
+            font-size: 2rem; cursor: pointer;
             background: none; border: none; z-index: 50;
             transition: transform 0.2s, filter 0.2s;
         }
-        #folder-btn:hover, #trash-btn:hover, #export-btn:hover, #import-btn:hover { transform: scale(1.1); }
+        .btn-icon:hover { transform: scale(1.1); }
         #trash-btn { filter: grayscale(0.5); }
         #trash-btn.active { filter: grayscale(0) drop-shadow(0 0 10px red); transform: scale(1.2); }
 
@@ -119,11 +118,32 @@
             -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
             pointer-events: none;
+            display: flex; align-items: center; justify-content: center;
+            padding: 10px; box-sizing: border-box; text-align: center;
+            font-size: 0.7rem; font-weight: bold; overflow: hidden;
         }
 
         .page-corner { position: absolute; bottom: 0; width: 70px; height: 70px; cursor: pointer; background: rgba(0,0,0,0.03); }
         .corner-left { left: 0; border-top-right-radius: 70px; }
         .corner-right { right: 0; border-top-left-radius: 70px; }
+
+        /* POST-IT MODAL */
+        #postit-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.7); z-index: 4000;
+            justify-content: center; align-items: center;
+        }
+        #postit-editor {
+            width: 400px; height: 400px; padding: 30px;
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.3);
+            border-radius: 2px; position: relative;
+            display: flex; flex-direction: column;
+        }
+        #postit-textarea {
+            width: 100%; height: 100%; border: none; background: transparent;
+            font-family: 'Courier New', Courier, monospace; font-size: 1.5rem;
+            resize: none; outline: none; color: #333;
+        }
 
         #crop-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -146,6 +166,9 @@
             -webkit-mask-image: var(--stamp-mask); mask-image: var(--stamp-mask);
             -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
             background-size: cover; background-position: center;
+            display: flex; align-items: center; justify-content: center;
+            padding: 10px; box-sizing: border-box; text-align: center;
+            font-size: 0.7rem; font-weight: bold; overflow: hidden;
         }
 
         #fullscreen-overlay {
@@ -160,6 +183,12 @@
     <div id="enigma-screen">
         <h1>Fear some lethal dust star</h1>
         <input type="text" id="enigma-input" autocomplete="off" placeholder="Password...">
+    </div>
+
+    <div id="postit-overlay">
+        <div id="postit-editor">
+            <textarea id="postit-textarea" placeholder="Scrivi qualcosa..."></textarea>
+        </div>
     </div>
 
     <div id="crop-overlay">
@@ -189,12 +218,13 @@
 
             <div id="spotify-container">
                 <div id="year-display"></div>
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6QnGn5n8qGGnWn6UlHu1Ah?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> 
+                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1E3579nS0p9Nf6?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> 
                 <div class="controls-row">
-                    <button id="folder-btn" title="Aggiungi Foto">📁</button>
-                    <button id="export-btn" title="Salva Backup (Esporta)">💾</button>
-                    <button id="import-btn" title="Carica Backup (Importa)">📂</button>
-                    <button id="trash-btn" title="Cestino">🗑️</button>
+                    <button class="btn-icon" id="folder-btn" title="Aggiungi Foto">📁</button>
+                    <button class="btn-icon" id="postit-btn" title="Aggiungi Post-it">📝</button>
+                    <button class="btn-icon" id="export-btn" title="Esporta Backup">📤</button>
+                    <button class="btn-icon" id="import-btn" title="Importa Backup">📂</button>
+                    <button class="btn-icon" id="trash-btn" title="Cestino">🗑️</button>
                 </div>
             </div>
         </div>
@@ -203,6 +233,16 @@
     </div>
 
     <script>
+        // CONFIG & STATE
+        let appState = 'IDLE'; 
+        let currentPostitColor = '';
+        let currentPostitId = null; 
+        const photoUrls = [
+            "https://raw.githubusercontent.com/Ntn28/MinhaColecao/main/foto1.png", 
+            "https://raw.githubusercontent.com/Ntn28/MinhaColecao/main/foto2.png",
+            "https://raw.githubusercontent.com/Ntn28/MinhaColecao/main/foto3.png"
+        ];
+
         // INIT SLOTS
         document.querySelectorAll('.slot-container').forEach(container => {
             for(let i = 1; i <= 4; i++) {
@@ -215,32 +255,25 @@
 
         // PASSWORD LOGIC
         const enigmaInput = document.getElementById('enigma-input');
-        const enigmaScreen = document.getElementById('enigma-screen');
-        const appScreen = document.getElementById('app-screen');
-
         enigmaInput.addEventListener('keyup', (e) => {
             if (e.target.value.toUpperCase() === '83A80-A052B-6WJFA') {
-                enigmaScreen.style.opacity = 0;
+                document.getElementById('enigma-screen').style.opacity = 0;
                 setTimeout(() => {
-                    enigmaScreen.style.display = 'none';
-                    appScreen.style.display = 'flex';
-                    setTimeout(() => appScreen.style.opacity = 1, 50);
+                    document.getElementById('enigma-screen').style.display = 'none';
+                    document.getElementById('app-screen').style.display = 'flex';
+                    setTimeout(() => document.getElementById('app-screen').style.opacity = 1, 50);
                 }, 1000);
             }
         });
 
-        document.getElementById('year-display').textContent = new Date().getFullYear();
-
-        // DATE LOGIC (FISSA)
+        // DATE LOGIC
         let currentOffset = 0;
         function formatDate(date) { return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }); }
-        
         function updateDates() {
-            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const today = new Date(); today.setHours(0,0,0,0);
             const epoch = new Date(2024, 0, 1);
             const diffDays = Math.round((today - epoch) / (1000 * 60 * 60 * 24));
             const blockStartOffset = diffDays - (diffDays % 4);
-
             for (let i = 1; i <= 4; i++) {
                 const day = new Date(epoch);
                 day.setDate(epoch.getDate() + blockStartOffset + (i - 1) + currentOffset); 
@@ -250,14 +283,54 @@
             }
             loadStampsFromStorage();
         }
-
         document.getElementById('prev-page').addEventListener('click', () => { currentOffset -= 4; updateDates(); });
-        document.getElementById('next-page').addEventListener('click', () => { if (currentOffset < 0) { currentOffset += 4; if (currentOffset > 0) currentOffset = 0; updateDates(); } });
+        document.getElementById('next-page').addEventListener('click', () => { if (currentOffset < 0) { currentOffset += 4; updateDates(); } });
 
-        // CROP & PLACING LOGIC
-        let appState = 'IDLE'; 
+        // POST-IT LOGIC
+        const postitOverlay = document.getElementById('postit-overlay');
+        const postitEditor = document.getElementById('postit-editor');
+        const postitTextarea = document.getElementById('postit-textarea');
+
+        function getRandomPostitColor() {
+            const hues = [50, 60, 150, 190, 280, 330]; // Colori pastello carini
+            return `hsl(${hues[Math.floor(Math.random()*hues.length)]}, 80%, 85%)`;
+        }
+
+        document.getElementById('postit-btn').addEventListener('click', () => {
+            appState = 'WRITING';
+            currentPostitColor = getRandomPostitColor();
+            postitTextarea.value = '';
+            postitEditor.style.backgroundColor = currentPostitColor;
+            postitOverlay.style.display = 'flex';
+            postitTextarea.focus();
+        });
+
+        postitOverlay.addEventListener('click', (e) => {
+            if (e.target === postitOverlay) {
+                const text = postitTextarea.value.trim();
+                if (text === "") {
+                    postitOverlay.style.display = 'none';
+                    appState = 'IDLE';
+                } else {
+                    minimizePostit(text, currentPostitColor);
+                }
+            }
+        });
+
+        function minimizePostit(text, color) {
+            postitOverlay.style.display = 'none';
+            appState = 'PLACING';
+            const floating = document.getElementById('floating-stamp');
+            floating.style.display = 'flex';
+            floating.style.backgroundImage = 'none';
+            floating.style.backgroundColor = color;
+            floating.textContent = text;
+            floating.dataset.type = 'postit';
+        }
+
+        // CROP & PLACING SHARED
         let cropWidth = 160; let cropHeight = 200; 
-        let finalCroppedBase64 = null;
+        let currentImgBase64 = null;
         let mouseX = 0, mouseY = 0;
         let pressTimer;
 
@@ -274,20 +347,8 @@
             } else if (appState === 'PLACING') {
                 floatingStamp.style.left = `${mouseX}px`; floatingStamp.style.top = `${mouseY}px`;
                 const trashRect = trashBtn.getBoundingClientRect();
-                if (mouseX > trashRect.left && mouseX < trashRect.right && mouseY > trashRect.top && mouseY < trashRect.bottom) {
-                    trashBtn.classList.add('active');
-                } else {
-                    trashBtn.classList.remove('active');
-                }
-            }
-        });
-
-        document.addEventListener('wheel', (e) => {
-            if (appState === 'CROPPING') {
-                const delta = e.deltaY > 0 ? -20 : 20;
-                cropWidth += delta; cropHeight += delta * 1.25;
-                if (cropWidth < 60) { cropWidth = 60; cropHeight = 75; }
-                cropCursor.style.width = `${cropWidth}px`; cropCursor.style.height = `${cropHeight}px`;
+                if (mouseX > trashRect.left && mouseX < trashRect.right && mouseY > trashRect.top && mouseY < trashRect.bottom) trashBtn.classList.add('active');
+                else trashBtn.classList.remove('active');
             }
         });
 
@@ -301,8 +362,7 @@
                     appState = 'CROPPING';
                     cropOverlay.style.display = 'flex';
                     cropCursor.style.display = 'block';
-                    cropCursor.style.width = `${cropWidth}px`;
-                    cropCursor.style.height = `${cropHeight}px`;
+                    cropCursor.style.width = `${cropWidth}px`; cropCursor.style.height = `${cropHeight}px`;
                 };
                 reader.readAsDataURL(file);
             }
@@ -313,31 +373,22 @@
             const rect = cropImage.getBoundingClientRect();
             const scaleX = cropImage.naturalWidth / rect.width;
             const scaleY = cropImage.naturalHeight / rect.height;
-            
             const saveCanvas = document.createElement('canvas');
-            saveCanvas.width = 240; 
-            saveCanvas.height = 300;
+            saveCanvas.width = 240; saveCanvas.height = 300;
             const ctx = saveCanvas.getContext('2d');
-            
-            ctx.drawImage(
-                cropImage, 
-                (mouseX - rect.left - cropWidth/2)*scaleX, 
-                (mouseY - rect.top - cropHeight/2)*scaleY, 
-                cropWidth*scaleX, 
-                cropHeight*scaleY, 
-                0, 0, 240, 300
-            );
-            
-            finalCroppedBase64 = saveCanvas.toDataURL('image/jpeg', 0.7);
-            
-            startPlacing(finalCroppedBase64);
+            ctx.drawImage(cropImage, (mouseX - rect.left - cropWidth/2)*scaleX, (mouseY - rect.top - cropHeight/2)*scaleY, cropWidth*scaleX, cropHeight*scaleY, 0, 0, 240, 300);
+            currentImgBase64 = saveCanvas.toDataURL('image/jpeg', 0.7);
+            startPlacingPhoto(currentImgBase64);
             cropOverlay.style.display = 'none';
         });
 
-        function startPlacing(imgBase64) {
+        function startPlacingPhoto(img) {
             appState = 'PLACING';
             floatingStamp.style.display = 'block';
-            floatingStamp.style.backgroundImage = `url(${imgBase64})`;
+            floatingStamp.style.backgroundImage = `url(${img})`;
+            floatingStamp.style.backgroundColor = 'transparent';
+            floatingStamp.textContent = '';
+            floatingStamp.dataset.type = 'photo';
         }
 
         trashBtn.addEventListener('click', () => {
@@ -345,41 +396,63 @@
                 appState = 'IDLE';
                 floatingStamp.style.display = 'none';
                 trashBtn.classList.remove('active');
-                finalCroppedBase64 = null;
             }
         });
 
         document.querySelectorAll('.slot').forEach(slot => {
-            slot.addEventListener('mousedown', function(e) {
+            slot.addEventListener('mousedown', function() {
                 if (appState !== 'IDLE') return;
-                const img = this.querySelector('.stamp-placed');
-                if (!img) return;
-
+                const hasStamp = this.querySelector('.stamp-placed');
+                if (!hasStamp) return;
                 pressTimer = setTimeout(() => {
                     const key = `stamp_${this.parentElement.getAttribute('data-date')}_${this.getAttribute('data-index')}`;
                     const data = JSON.parse(localStorage.getItem(key));
                     localStorage.removeItem(key);
                     this.innerHTML = '';
-                    finalCroppedBase64 = data.image;
-                    startPlacing(data.image);
-                    appState = 'PLACING';
+                    if (data.type === 'postit') {
+                        currentPostitColor = data.color;
+                        minimizePostit(data.text, data.color);
+                    } else {
+                        currentImgBase64 = data.image;
+                        startPlacingPhoto(data.image);
+                    }
                 }, 500);
             });
-
-            slot.addEventListener('mouseup', function() { clearTimeout(pressTimer); });
-            slot.addEventListener('mouseleave', function() { clearTimeout(pressTimer); });
+            slot.addEventListener('mouseup', () => clearTimeout(pressTimer));
+            slot.addEventListener('mouseleave', () => clearTimeout(pressTimer));
 
             slot.addEventListener('click', function() {
-                if (appState === 'PLACING' && finalCroppedBase64) {
-                    const stampData = { image: finalCroppedBase64, x: (Math.random()-0.5)*12, y: (Math.random()-0.5)*12, r: (Math.random()-0.5)*10 };
+                if (appState === 'PLACING') {
+                    const type = floatingStamp.dataset.type;
+                    let stampData = { 
+                        type: type,
+                        x: (Math.random()-0.5)*12, y: (Math.random()-0.5)*12, r: (Math.random()-0.5)*10 
+                    };
+                    if (type === 'postit') {
+                        stampData.text = floatingStamp.textContent;
+                        stampData.color = floatingStamp.style.backgroundColor;
+                    } else {
+                        stampData.image = currentImgBase64;
+                    }
                     const key = `stamp_${this.parentElement.getAttribute('data-date')}_${this.getAttribute('data-index')}`;
-                    applyStampToSlot(this, stampData);
                     localStorage.setItem(key, JSON.stringify(stampData));
+                    applyStampToSlot(this, stampData);
                     appState = 'IDLE'; floatingStamp.style.display = 'none';
                 } else if (appState === 'IDLE') {
-                    const img = this.querySelector('.stamp-placed');
-                    if (img) {
-                        document.getElementById('fullscreen-img').src = img.style.backgroundImage.slice(5, -2);
+                    const stamp = this.querySelector('.stamp-placed');
+                    if (!stamp) return;
+                    const key = `stamp_${this.parentElement.getAttribute('data-date')}_${this.getAttribute('data-index')}`;
+                    const data = JSON.parse(localStorage.getItem(key));
+                    if (data.type === 'postit') {
+                        // Modifica Post-it
+                        currentPostitId = key;
+                        currentPostitColor = data.color;
+                        postitTextarea.value = data.text;
+                        postitEditor.style.backgroundColor = data.color;
+                        postitOverlay.style.display = 'flex';
+                        appState = 'WRITING';
+                    } else {
+                        document.getElementById('fullscreen-img').src = data.image;
                         document.getElementById('fullscreen-overlay').style.display = 'flex';
                     }
                 }
@@ -389,7 +462,17 @@
         document.getElementById('fullscreen-overlay').addEventListener('click', function() { this.style.display = 'none'; });
 
         function applyStampToSlot(slot, data) {
-            slot.innerHTML = `<div class="stamp-placed" style="background-image:url(${data.image}); transform:translate(${data.x}px, ${data.y}px) rotate(${data.r}deg)"></div>`;
+            const div = document.createElement('div');
+            div.className = 'stamp-placed';
+            div.style.transform = `translate(${data.x}px, ${data.y}px) rotate(${data.r}deg)`;
+            if (data.type === 'postit') {
+                div.style.backgroundColor = data.color;
+                div.textContent = data.text;
+            } else {
+                div.style.backgroundImage = `url(${data.image})`;
+            }
+            slot.innerHTML = '';
+            slot.appendChild(div);
         }
 
         function loadStampsFromStorage() {
@@ -401,92 +484,54 @@
             });
         }
 
-        // Esporta
+        // BACKUP
         document.getElementById('export-btn').addEventListener('click', () => {
             const albumData = {};
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
-                if (key.startsWith('stamp_')) {
-                    albumData[key] = localStorage.getItem(key);
-                }
+                if (key.startsWith('stamp_')) albumData[key] = localStorage.getItem(key);
             }
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(albumData));
-            const a = document.createElement('a');
-            a.href = dataStr;
-            a.download = "minhacolecao_backup.json";
-            document.body.appendChild(a);
+            const a = document.createElement('a'); a.href = dataStr; a.download = "minhacolecao_backup.json";
             a.click();
-            a.remove();
         });
 
-        // Importa
-        document.getElementById('import-btn').addEventListener('click', () => {
-            document.getElementById('import-input').click();
-        });
-
+        document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-input').click());
         document.getElementById('import-input').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = (event) => {
                 try {
-                    const importedData = JSON.parse(event.target.result);
-                    for (let key in localStorage) {
-                        if (key.startsWith('stamp_')) localStorage.removeItem(key);
-                    }
-                    for (const key in importedData) {
-                        localStorage.setItem(key, importedData[key]);
-                    }
+                    const imported = JSON.parse(event.target.result);
+                    Object.keys(localStorage).forEach(k => { if(k.startsWith('stamp_')) localStorage.removeItem(k); });
+                    for (const k in imported) localStorage.setItem(k, imported[k]);
                     loadStampsFromStorage();
-                    alert("Backup caricato con successo!");
-                } catch (err) {
-                    alert("Errore: Il file non è valido o è corrotto.");
-                }
-                e.target.value = ''; 
+                    alert("Backup caricato!");
+                } catch (err) { alert("File non valido"); }
             };
             reader.readAsText(file);
         });
 
-        updateDates();
-
-        // === LOGICA SFONDO FOTO CADENTI ===
-        const fallingBg = document.getElementById('falling-background');
-        
-        // Metti i tuoi 3 link GitHub Raw qui sotto:
-     // I link corretti per GitHub Raw:
-        const photoUrls = [
-            "https://raw.githubusercontent.com/Ntn28/MinhaColecao/main/foto1.png", 
-            "https://raw.githubusercontent.com/Ntn28/MinhaColecao/main/foto2.png",
-            "https://raw.githubusercontent.com/Ntn28/MinhaColecao/main/foto3.png"
-        ];
-
+        // FALLING BACKGROUND
         function createFallingPhotos() {
-            const numPhotos = 15; // Quante foto ci sono contemporaneamente in giro
+            const numPhotos = 15;
             for (let i = 0; i < numPhotos; i++) {
                 const img = document.createElement('img');
                 img.src = photoUrls[i % photoUrls.length];
                 img.className = 'falling-photo';
-                
-                // Dimensioni casuali (tra 60px e 130px di larghezza)
                 const size = Math.random() * 70 + 60; 
-                img.style.width = `${size}px`;
-                img.style.height = `${size * 1.3}px`; // Leggermente rettangolari
-                
-                // Posizione orizzontale casuale (da 0 a 100% della larghezza schermo)
+                img.style.width = `${size}px`; img.style.height = `${size * 1.3}px`;
                 img.style.left = `${Math.random() * 100}vw`;
-                
-                // Velocità di caduta casuale (tra 12 e 25 secondi)
                 img.style.animationDuration = `${Math.random() * 13 + 12}s`;
-                
-                // Partenza sfasata, per non farle cadere tutte insieme (tra 0 e 15 secondi)
                 img.style.animationDelay = `${Math.random() * 15}s`;
-                
-                fallingBg.appendChild(img);
+                document.getElementById('falling-background').appendChild(img);
             }
         }
-        
+
+        document.getElementById('year-display').textContent = new Date().getFullYear();
+        updateDates();
         createFallingPhotos();
-        // ======================================
     </script>
 </body>
 </html>
