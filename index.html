@@ -18,27 +18,6 @@
             display: flex; justify-content: center; align-items: center;
             height: 100vh; width: 100vw; overflow: hidden;
             user-select: none;
-            position: relative; /* Necessario per posizionare le immagini di sfondo */
-        }
-
-        /* Stile per le immagini di sfondo che cadono */
-        .falling-image {
-            position: absolute;
-            background-size: cover;
-            background-position: center;
-            width: 150px; /* Dimensione base delle immagini che cadono */
-            height: 150px;
-            opacity: 0;
-            z-index: 0; /* Dietro a tutto */
-            pointer-events: none; /* Non devono interferire con i click */
-            animation: fall-and-fade linear infinite;
-        }
-
-        @keyframes fall-and-fade {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.2; } /* Appare un po' */
-            80% { opacity: 0.1; } /* Sbiadisce mentre cade */
-            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
         }
 
         #enigma-screen {
@@ -58,12 +37,32 @@
             width: 100%; height: 100%;
             display: flex; justify-content: center; align-items: center;
             position: relative;
-            z-index: 1; /* Il libro e i controlli devono stare sopra le immagini che cadono */
+        }
+
+        /* --- EFFETTO SFONDO CADENTE --- */
+        #falling-background {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; overflow: hidden;
+        }
+        .falling-photo {
+            position: absolute; top: -200px;
+            opacity: 0.2; /* Opacità per non disturbare troppo la vista */
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            object-fit: cover;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(-15deg); opacity: 0; }
+            5% { opacity: 0.25; }
+            90% { opacity: 0.25; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
         }
 
         .main-container {
             display: flex; align-items: center; gap: 40px;
             width: 95%; max-width: 1600px; height: 90vh;
+            position: relative; z-index: 10; /* Sopra lo sfondo che cade */
         }
 
         .book {
@@ -82,6 +81,7 @@
             background: rgba(0,0,0,0.2); border-radius: 15px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); padding: 15px;
+            backdrop-filter: blur(8px); /* Rende lo sfondo più elegante dietro spotify */
         }
 
         #year-display {
@@ -157,8 +157,6 @@
 </head>
 <body>
 
-    <div id="falling-images-container"></div>
-
     <div id="enigma-screen">
         <h1>Fear some lethal dust star</h1>
         <input type="text" id="enigma-input" autocomplete="off" placeholder="Password...">
@@ -173,6 +171,8 @@
     <div id="fullscreen-overlay"><img id="fullscreen-img" src=""></div>
 
     <div id="app-screen">
+        <div id="falling-background"></div>
+
         <div class="main-container">
             <div class="book">
                 <div class="page">
@@ -203,13 +203,6 @@
     </div>
 
     <script>
-        // *** INSERISCI QUI GLI URL DELLE TUE FOTO DA GITHUB ***
-        const backgroundImages = [
-            'https://github.com/Ntn28/MinhaColecao/blob/b8648fd599ffb2b5e64c36c33fb58e5c470998bb/foto1.png', // Esempio: 'https://raw.githubusercontent.com/tuo_nome_utente/tuo_repository/main/foto1.jpg'
-            'https://github.com/Ntn28/MinhaColecao/blob/b8648fd599ffb2b5e64c36c33fb58e5c470998bb/foto2.png',
-            'https://github.com/Ntn28/MinhaColecao/blob/b8648fd599ffb2b5e64c36c33fb58e5c470998bb/foto3.png'
-        ];
-
         // INIT SLOTS
         document.querySelectorAll('.slot-container').forEach(container => {
             for(let i = 1; i <= 4; i++) {
@@ -232,7 +225,6 @@
                     enigmaScreen.style.display = 'none';
                     appScreen.style.display = 'flex';
                     setTimeout(() => appScreen.style.opacity = 1, 50);
-                    startFallingImages(); // Avvia le immagini che cadono dopo la password
                 }, 1000);
             }
         });
@@ -348,7 +340,6 @@
             floatingStamp.style.backgroundImage = `url(${imgBase64})`;
         }
 
-        // CESTINO LOGIC
         trashBtn.addEventListener('click', () => {
             if (appState === 'PLACING') {
                 appState = 'IDLE';
@@ -358,7 +349,6 @@
             }
         });
 
-        // SLOT LOGIC (CLICK + LONG PRESS)
         document.querySelectorAll('.slot').forEach(slot => {
             slot.addEventListener('mousedown', function(e) {
                 if (appState !== 'IDLE') return;
@@ -411,8 +401,6 @@
             });
         }
 
-        // *** LOGICA ESPORTA E IMPORTA JSON ***
-
         // Esporta
         document.getElementById('export-btn').addEventListener('click', () => {
             const albumData = {};
@@ -443,70 +431,61 @@
             reader.onload = (event) => {
                 try {
                     const importedData = JSON.parse(event.target.result);
-                    // Pulisci le vecchie foto dal browser corrente
                     for (let key in localStorage) {
                         if (key.startsWith('stamp_')) localStorage.removeItem(key);
                     }
-                    // Carica le nuove
                     for (const key in importedData) {
                         localStorage.setItem(key, importedData[key]);
                     }
-                    // Aggiorna lo schermo
                     loadStampsFromStorage();
                     alert("Backup caricato con successo!");
                 } catch (err) {
                     alert("Errore: Il file non è valido o è corrotto.");
                 }
-                // Resetta l'input file per permettere di ricaricare lo stesso file
                 e.target.value = ''; 
             };
             reader.readAsText(file);
         });
 
-        // *** LOGICA IMMAGINI CHE CADONO SULLO SFONDO ***
-        const fallingImagesContainer = document.getElementById('falling-images-container');
+        updateDates();
 
-        function createFallingImage() {
-            const imgDiv = document.createElement('div');
-            imgDiv.className = 'falling-image';
-            const randomImage = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
-            imgDiv.style.backgroundImage = `url(${randomImage})`;
+        // === LOGICA SFONDO FOTO CADENTI ===
+        const fallingBg = document.getElementById('falling-background');
+        
+        // Metti i tuoi 3 link GitHub Raw qui sotto:
+        const photoUrls = [
+            "URL_FOTO_1_QUI", 
+            "URL_FOTO_2_QUI",
+            "URL_FOTO_3_QUI"
+        ];
 
-            // Posizione orizzontale casuale
-            imgDiv.style.left = `${Math.random() * 100}vw`;
-
-            // Dimensione casuale (leggermente più grandi o più piccole)
-            const randomSize = 100 + Math.random() * 100; // Tra 100px e 200px
-            imgDiv.style.width = `${randomSize}px`;
-            imgDiv.style.height = `${randomSize}px`;
-
-            // Durata animazione casuale (per desincronizzare le cadute)
-            const randomDuration = 10 + Math.random() * 10; // Tra 10s e 20s
-            imgDiv.style.animationDuration = `${randomDuration}s`;
-
-            // Ritardo animazione casuale (per farle apparire in momenti diversi)
-            const randomDelay = Math.random() * 5; // Fino a 5s di ritardo
-            imgDiv.style.animationDelay = `-${randomDelay}s`; // Inizia già in animazione
-
-            // Rotazione iniziale casuale (per variare l'aspetto)
-            imgDiv.style.transform = `rotate(${Math.random() * 360}deg)`;
-
-
-            fallingImagesContainer.appendChild(imgDiv);
-
-            // Rimuovi l'elemento una volta terminata l'animazione per non appesantire il DOM
-            imgDiv.addEventListener('animationiteration', () => {
-                imgDiv.remove();
-                createFallingImage(); // Crea una nuova immagine quando una finisce
-            });
-            // Fallback per browser che non supportano animationiteration o per pulizia
-            setTimeout(() => {
-                if (imgDiv.parentNode) { // Controlla se l'elemento è ancora nel DOM
-                    imgDiv.remove();
-                    createFallingImage();
-                }
-            }, randomDuration * 1000 + 1000); // Durata animazione + un secondo
+        function createFallingPhotos() {
+            const numPhotos = 15; // Quante foto ci sono contemporaneamente in giro
+            for (let i = 0; i < numPhotos; i++) {
+                const img = document.createElement('img');
+                img.src = photoUrls[i % photoUrls.length];
+                img.className = 'falling-photo';
+                
+                // Dimensioni casuali (tra 60px e 130px di larghezza)
+                const size = Math.random() * 70 + 60; 
+                img.style.width = `${size}px`;
+                img.style.height = `${size * 1.3}px`; // Leggermente rettangolari
+                
+                // Posizione orizzontale casuale (da 0 a 100% della larghezza schermo)
+                img.style.left = `${Math.random() * 100}vw`;
+                
+                // Velocità di caduta casuale (tra 12 e 25 secondi)
+                img.style.animationDuration = `${Math.random() * 13 + 12}s`;
+                
+                // Partenza sfasata, per non farle cadere tutte insieme (tra 0 e 15 secondi)
+                img.style.animationDelay = `${Math.random() * 15}s`;
+                
+                fallingBg.appendChild(img);
+            }
         }
-
-        function startFallingImages() {
-            //
+        
+        createFallingPhotos();
+        // ======================================
+    </script>
+</body>
+</html>
